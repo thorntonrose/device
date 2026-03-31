@@ -43,6 +43,11 @@ func InitLocations(location *[][]byte, start int, count int, size int) {
 
 //-----------------------------------------------------------------------------
 
+func (m *Memory) Get(locNum int) []byte {
+	m.CheckBounds(locNum)
+	return m.Locations[locNum]
+}
+
 func (m *Memory) Set(locNum int, value []byte) {
 	m.CheckBounds(locNum)
 	m.CheckReserved(locNum)
@@ -51,11 +56,6 @@ func (m *Memory) Set(locNum int, value []byte) {
 	m.CheckSize(*loc, value)
 	*loc = (*loc)[:len(value)]
 	copy(*loc, value)
-}
-
-func (m *Memory) Get(locNum int) []byte {
-	m.CheckBounds(locNum)
-	return m.Locations[locNum]
 }
 
 func (m *Memory) CheckBounds(locNum int) {
