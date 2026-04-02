@@ -10,21 +10,10 @@ import (
 	"github.com/thorntonrose/device/internal/mem"
 )
 
-var DirectivePattern = regexp.MustCompile(`^(\d)+(=|\$)(.*)$`)
-var CommandPattern = regexp.MustCompile(`^(\*|\+)?([A-Z])([0-9\.])*`)
-
-func Run() {
-	device := New()
-	fmt.Println(device.Memory.Dump(mem.Transmit, 3, 20))
-
-	device.Load("003=HELLO\n020$X")
-	fmt.Println(device.Memory.Dump(mem.Transmit, 3, 20))
-
-	device.Run(20)
-	fmt.Println(device.Memory.Dump(mem.Transmit, 3, 20))
-}
-
-//-----------------------------------------------------------------------------
+var (
+	CommandPattern   = regexp.MustCompile(`(\*|\+)?([A-Z])([0-9\.])*`)
+	DirectivePattern = regexp.MustCompile(`^(\d)+(=|\$)(.*)$`)
+)
 
 type Device struct {
 	Memory    mem.Memory
