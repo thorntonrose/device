@@ -1,4 +1,4 @@
-module github.com/thorntonrose/gamedevice
+module github.com/thorntonrose/device
 
 go 1.25.4
 

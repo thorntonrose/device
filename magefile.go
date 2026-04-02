@@ -14,7 +14,9 @@ var (
 	Name    = "device"
 	BinDir  = "bin"
 	TempDir = "tmp"
-	Tests   = "Test"
+
+	Pkg   = "./..."
+	Tests = "Test"
 
 	Env = map[string]string{}
 )
@@ -30,7 +32,7 @@ func Build() {
 }
 
 func Test() {
-	bash("go test -v -run %s ./...", getEnv("TESTS", Tests))
+	bash("go test -v -run %s %s", getEnv("TESTS", Tests), getEnv("PACKAGE", Pkg))
 }
 
 func bash(format string, args ...any) {

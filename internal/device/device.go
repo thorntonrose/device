@@ -2,88 +2,72 @@ package device
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
+
+	"github.com/thorntonrose/device/internal/buf"
+	"github.com/thorntonrose/device/internal/mem"
 )
 
-const (
-	MaxMemory              = 40
-	TransmitBufferLocation = 2
-	ReceiveBufferLocation  = 3
-)
-
-// Location Number	Size	Description
-// ----------------	----	-----------
-// 000 - 001			-		reserved
-// 002					250	buffer 1 (transmit)
-// 003					250	buffer 2 (receive)
-// 004 - 019			-		reserved
-// 020 - 039			120	general purpose
-
-type Memory [][]byte
-
-var (
-	SourceBufferLocation = ReceiveBufferLocation
-	DestBufferLocation   = TransmitBufferLocation
-)
+var DirectivePattern = regexp.MustCompile(`^(\d)+(=|\$)(.*)$`)
+var CommandPattern = regexp.MustCompile(`^(\*|\+)?([A-Z])([0-9\.])*`)
 
 func Run() {
-	memory := InitMemory()
-	Load(memory, "003=HELLO\n020=A\n021$X")
+	device := New()
+	fmt.Println(device.Memory.Dump(mem.Transmit, 3, 20))
 
-	// 020=A
-	// 003=HELLO
-	//
-	// 021$
-	//   X
+	device.Load("003=HELLO\n020$X")
+	fmt.Println(device.Memory.Dump(mem.Transmit, 3, 20))
 
-	fmt.Println(string(memory[3]))
-	fmt.Println(string(memory[20]))
-	fmt.Println(string(memory[TransmitBufferLocation]))
+	device.Run(20)
+	fmt.Println(device.Memory.Dump(mem.Transmit, 3, 20))
 }
 
-func InitMemory() Memory {
-	memory := make(Memory, MaxMemory)
-	memory[TransmitBufferLocation] = make([]byte, 250)
-	memory[ReceiveBufferLocation] = make([]byte, 250)
+//-----------------------------------------------------------------------------
 
-	for i := 4; i < MaxMemory; i++ {
-		memory[i] = make([]byte, 120)
-	}
-
-	return memory
+type Device struct {
+	Memory    mem.Memory
+	BufferSet buf.BufferSet
+	Commands  map[string]func(parameters []string)
 }
 
-func Load(memory Memory, program string) {
-	lines := strings.Split(program, "\n")
-	memory = Assign(memory, lines[0])
-	memory = Assign(memory, lines[1])
+func New() Device {
+	device := Device{Memory: mem.New()}
+	device.BufferSet = buf.NewBufferSet(device.Memory, 0)
+	device.Commands = map[string]func(parameters []string){"X": device.RunX}
 
-	tokens := strings.Split(lines[2], "$")
-	// ???: Need to do something with location in tokens[0].
-	memory = RunScript(memory, tokens[1])
+	return device
 }
 
-func Assign(memory Memory, directive string) Memory {
-	location := 0
-	value := ""
-
-	_, err := fmt.Sscanf(directive, "%d=%s", &location, &value)
-	if err != nil {
-		panic(err)
+func (d Device) Load(program string) {
+	for _, line := range strings.Split(program, "\n") {
+		d.Memory.Set(d.Parse(line))
 	}
-
-	if len(value) > 120 {
-		panic("value exceeds maximum size")
-	}
-
-	memory[location] = []byte(value)
-	return memory
 }
 
-func RunScript(memory Memory, script string) Memory {
-	if string(script) == "X" {
-		memory[DestBufferLocation] = memory[SourceBufferLocation]
+func (d Device) Parse(line string) (location int, value []byte) {
+	// expect: [<line>, <location>, <operator>, <value>]
+	if matches := DirectivePattern.FindStringSubmatch(line); len(matches) == 4 {
+		location, _ := strconv.Atoi(matches[1])
+		return location, []byte(matches[3])
 	}
 
-	return memory
+	panic(fmt.Sprintf("invalid directive: %s", line))
+}
+
+func (d Device) Run(location int) {
+	script := string(d.Memory[location])
+
+	for _, tokens := range CommandPattern.FindAllStringSubmatch(script, -1) {
+		d.RunCommand(tokens)
+	}
+}
+
+func (d Device) RunCommand(tokens []string) {
+	d.Commands[tokens[1]+tokens[2]](tokens[3:])
+}
+
+func (d Device) RunX(parameters []string) {
+	d.BufferSet.Copy()
 }
