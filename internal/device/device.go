@@ -1,4 +1,4 @@
-package gamedevice
+package device
 
 import (
 	"fmt"

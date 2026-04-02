@@ -4,32 +4,39 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-func TestSet(t *testing.T) {
+type MemorySuite struct {
+	suite.Suite
+}
+
+func TestMemorySuite(t *testing.T) {
+	suite.Run(t, new(MemorySuite))
+}
+
+//-----------------------------------------------------------------------------
+
+func (s *MemorySuite) TestNew() {
+	memory := New()
+	assert.Len(s.T(), memory.Locations, MaxLocations)
+	assert.Len(s.T(), memory.Buffers, MaxBuffers)
+	assert.NotNil(s.T(), memory.SourceBuffer)
+	assert.NotNil(s.T(), memory.DestinationBuffer)
+}
+
+func (s *MemorySuite) TestSet() {
 	data := []byte("FOO")
 	memory := New()
 
 	memory.Set(20, data)
-	assert.Equal(t, data, memory.Locations[20])
+	assert.Equal(s.T(), string(data), memory.Locations[20].String())
 }
 
-func TestGet(t *testing.T) {
+func (s *MemorySuite) TestGet() {
 	data := []byte("FOO")
 	memory := New()
 
 	memory.Set(20, data)
-	assert.Equal(t, data, memory.Get(20))
-}
-
-func TestDump(t *testing.T) {
-	memory := New()
-
-	for i := range memory.Locations {
-		if !memory.IsReserved(i) {
-			memory.Set(i, []byte("A"))
-		}
-	}
-
-	memory.Dump()
+	assert.Equal(s.T(), string(data), memory.Get(20).String())
 }

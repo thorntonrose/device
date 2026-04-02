@@ -9,16 +9,36 @@ const (
 )
 
 type Buffer struct {
-	Location          *[]byte
+	Location          *Location
 	ExtractionPointer int
 }
 
-func NewBuffers() []Buffer {
+func NewBuffers(locations []Location) []Buffer {
 	buffers := make([]Buffer, MaxBuffers)
-
-	for i := range buffers {
-		buffers[i] = Buffer{}
-	}
+	buffers[TransmitBufferNum-1] = *NewBuffer(&locations[TransmitBufferNum-1])
+	buffers[ReceiveBufferNum-1] = *NewBuffer(&locations[ReceiveBufferNum-1])
 
 	return buffers
+}
+
+func NewBuffer(location *Location) *Buffer {
+	return &Buffer{Location: location}
+}
+
+//-----------------------------------------------------------------------------
+
+func (b *Buffer) Read() byte {
+	data := (*b.Location)[b.ExtractionPointer]
+	b.ExtractionPointer++
+
+	return data
+}
+
+func (b *Buffer) Write(data byte) {
+	b.Location.Append(data)
+	b.ExtractionPointer++
+}
+
+func (b *Buffer) Reset() {
+	b.ExtractionPointer = 0
 }
