@@ -23,7 +23,6 @@ func (s Script) Run(location int) {
 
 //-----------------------------------------------------------------------------
 
-type Command struct {
-	Script     Script
-	Parameters []string
+type Command interface {
+	Run(script Script, parameters []string)
 }
