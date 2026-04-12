@@ -1,62 +1,36 @@
 package device
 
 import (
-	"fmt"
-	"regexp"
-	"strconv"
-	"strings"
-
-	"github.com/thorntonrose/device/internal/buf"
+	"github.com/thorntonrose/device/internal/command"
 	"github.com/thorntonrose/device/internal/mem"
-)
-
-var (
-	CommandPattern   = regexp.MustCompile(`(\*|\+)?([A-Z])([0-9\.])*`)
-	DirectivePattern = regexp.MustCompile(`^(\d)+(=|\$)(.*)$`)
+	"github.com/thorntonrose/device/internal/parser"
+	"github.com/thorntonrose/device/internal/script"
 )
 
 type Device struct {
-	Memory    mem.Memory
-	BufferSet buf.BufferSet
-	Commands  map[string]func(parameters []string)
+	Memory   mem.Memory
+	Commands map[string]command.Runner
+	Script   script.Script
 }
 
 func New() Device {
-	device := Device{Memory: mem.New()}
-	device.BufferSet = buf.NewBufferSet(device.Memory, 0)
-	device.Commands = map[string]func(parameters []string){"X": device.RunX}
+	d := Device{Memory: mem.New()}
+	d.Commands = NewCommands(&d.Memory)
+	d.Script = script.New(&d.Memory, d.Commands)
 
-	return device
+	return d
+}
+
+func NewCommands(memory *mem.Memory) map[string]command.Runner {
+	return map[string]command.Runner{
+		"X": command.NewX(memory),
+	}
 }
 
 func (d Device) Load(program string) {
-	for _, line := range strings.Split(program, "\n") {
-		d.Memory.Set(d.Parse(line))
-	}
+	d.Memory.Load(parser.Parse(program))
 }
 
-func (d Device) Parse(line string) (location int, value []byte) {
-	// expect: [<line>, <location>, <operator>, <value>]
-	if matches := DirectivePattern.FindStringSubmatch(line); len(matches) == 4 {
-		location, _ := strconv.Atoi(matches[1])
-		return location, []byte(matches[3])
-	}
-
-	panic(fmt.Sprintf("invalid directive: %s", line))
-}
-
-func (d Device) Run(location int) {
-	script := string(d.Memory[location])
-
-	for _, tokens := range CommandPattern.FindAllStringSubmatch(script, -1) {
-		d.RunCommand(tokens)
-	}
-}
-
-func (d Device) RunCommand(tokens []string) {
-	d.Commands[tokens[1]+tokens[2]](tokens[3:])
-}
-
-func (d Device) RunX(parameters []string) {
-	d.BufferSet.Copy()
+func (d Device) Run(slot int) {
+	d.Script.Run(slot)
 }

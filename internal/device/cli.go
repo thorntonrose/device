@@ -1,18 +1,38 @@
 package device
 
 import (
+	"flag"
 	"fmt"
+	"os"
+	"path/filepath"
 
-	"github.com/thorntonrose/device/internal/mem"
+	"github.com/thorntonrose/device/internal/etc"
 )
 
 func Run() {
+	slot := flag.Int("slot", 0, "")
+	flag.Usage = Usage
+	flag.Parse()
+	fileName := GetFile()
+
 	device := New()
-	fmt.Println(device.Memory.Dump(mem.Transmit, 3, 20))
+	device.Load(string(etc.Must(os.ReadFile(fileName))))
+	device.Run(*slot)
+	fmt.Println(device.Memory.Dump())
+}
 
-	device.Load("003=HELLO\n020$X")
-	fmt.Println(device.Memory.Dump(mem.Transmit, 3, 20))
+func Usage() {
+	fmt.Printf("Usage: %s [flags] <file>\n", filepath.Base(os.Args[0]))
+	fmt.Println("Flags:")
+	fmt.Println("  -slot = script slot number")
 
-	device.Run(20)
-	fmt.Println(device.Memory.Dump(mem.Transmit, 3, 20))
+	os.Exit(1)
+}
+
+func GetFile() string {
+	if flag.NArg() < 1 {
+		Usage()
+	}
+
+	return flag.Arg(0)
 }
