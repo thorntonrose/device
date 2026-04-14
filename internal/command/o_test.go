@@ -9,7 +9,7 @@ import (
 
 func TestO(t *testing.T) {
 	memory := mem.New()
-	memory.Set(mem.Slot(mem.Receive), []byte("HELLO"))
+	memory.Set(mem.BufSlot(mem.Receive), []byte("HELLO"))
 
 	o := NewO(memory)
 

@@ -83,13 +83,13 @@ func Directive(lines []string, index int) (int, int, []byte) {
 
 func Assignment(line string, sep string) (int, []byte) {
 	if tokens := strings.SplitN(line, sep, 2); len(tokens) == 2 {
-		return Slot(tokens[0]), Text(tokens[1])
+		return BufSlot(tokens[0]), Text(tokens[1])
 	}
 
 	return 0, nil
 }
 
-func Slot(token string) int {
+func BufSlot(token string) int {
 	defer etc.Recover(func(e error) { panic("invalid slot: " + token) })
 	return etc.Must(strconv.Atoi(etc.Value(token, "0")))
 }

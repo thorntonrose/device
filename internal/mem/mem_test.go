@@ -72,7 +72,7 @@ func TestDump(t *testing.T) {
 
 func TestRead(t *testing.T) {
 	memory := New()
-	memory.Set(Slot(Receive), []byte{'A'})
+	memory.Set(BufSlot(Receive), []byte{'A'})
 
 	assert.Equal(t, byte('A'), memory.Read(Receive))
 	assert.Equal(t, 1, memory.Pointers[Receive])
@@ -80,21 +80,21 @@ func TestRead(t *testing.T) {
 
 func TestReadAll(t *testing.T) {
 	memory := New()
-	memory.Set(Slot(Receive), []byte{'A', 'B', 'C'})
+	memory.Set(BufSlot(Receive), []byte{'A', 'B', 'C'})
 
 	assert.Equal(t, []byte{'A', 'B', 'C'}, memory.ReadAll(Receive, 0, 0))
 }
 
 func TestReadAll_Max(t *testing.T) {
 	memory := New()
-	memory.Set(Slot(Receive), []byte{'A', 'B', 'C'})
+	memory.Set(BufSlot(Receive), []byte{'A', 'B', 'C'})
 
 	assert.Equal(t, []byte{'A', 'B'}, memory.ReadAll(Receive, 2, 0))
 }
 
 func TestReadAll_Stop(t *testing.T) {
 	memory := New()
-	memory.Set(Slot(Receive), []byte{'A', 28, 'B'})
+	memory.Set(BufSlot(Receive), []byte{'A', 28, 'B'})
 
 	assert.Equal(t, []byte{'A'}, memory.ReadAll(Receive, 0, 28))
 }
@@ -103,7 +103,7 @@ func TestWriteAll(t *testing.T) {
 	memory := New()
 
 	memory.WriteAll(Transmit, []byte{'A'})
-	assert.Equal(t, []byte{'A'}, memory.Slots[Slot(Transmit)])
+	assert.Equal(t, []byte{'A'}, memory.Slots[BufSlot(Transmit)])
 }
 
 func TestClear(t *testing.T) {
@@ -111,5 +111,5 @@ func TestClear(t *testing.T) {
 	memory.WriteAll(Transmit, []byte{'A'})
 
 	memory.Clear(Transmit)
-	assert.Equal(t, []byte{}, memory.Slots[Slot(Transmit)])
+	assert.Equal(t, []byte{}, memory.Slots[BufSlot(Transmit)])
 }

@@ -9,10 +9,10 @@ import (
 
 func TestX(t *testing.T) {
 	memory := mem.New()
-	memory.Set(mem.Slot(mem.Receive), []byte("HELLO"))
+	memory.Set(mem.BufSlot(mem.Receive), []byte("HELLO"))
 
 	NewX(memory).Run([]string{})
-	assert.Equal(t, []byte("HELLO"), memory.Get(mem.Slot(mem.Transmit)))
+	assert.Equal(t, []byte("HELLO"), memory.Get(mem.BufSlot(mem.Transmit)))
 }
 
 // ???: Need more tests.

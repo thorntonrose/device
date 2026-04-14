@@ -55,11 +55,11 @@ func NewSlots() [][]byte {
 
 func AddBlock(slots *[][]byte, start int, end int, size int) {
 	for i := start; i <= end; i++ {
-		AddSlot(slots, i, size)
+		AddBufSlot(slots, i, size)
 	}
 }
 
-func AddSlot(slots *[][]byte, i int, size int) {
+func AddBufSlot(slots *[][]byte, i int, size int) {
 	(*slots)[i] = make([]byte, 0, size)
 
 	if size == MaxReservedSize {
@@ -70,10 +70,11 @@ func AddSlot(slots *[][]byte, i int, size int) {
 func RandomValue() []byte {
 	md5sum := md5.Sum([]byte(time.Now().String()))
 	s := hex.EncodeToString(md5sum[:])
+
 	return []byte(strings.ToUpper(s)[:rand.Intn(len(s)-1)+1])
 }
 
-func Slot(buf int) int {
+func BufSlot(buf int) int {
 	return buf + 1
 }
 
@@ -140,11 +141,11 @@ func (m *Memory) ReadAll(buf int, maxCount int, stop byte) (data []byte) {
 }
 
 func (m *Memory) HasNext(buf int, count int, maxCount int) bool {
-	return (maxCount == 0 || count < maxCount) && m.Pointers[buf] < len(m.Slots[Slot(buf)])
+	return (maxCount == 0 || count < maxCount) && m.Pointers[buf] < len(m.Slots[BufSlot(buf)])
 }
 
 func (m *Memory) Read(buf int) byte {
-	data := m.Slots[Slot(buf)][m.Pointers[buf]]
+	data := m.Slots[BufSlot(buf)][m.Pointers[buf]]
 	m.Pointers[buf]++
 
 	return data
@@ -155,12 +156,12 @@ func (m *Memory) WriteAll(buf int, data []byte) {
 }
 
 func (m *Memory) Write(buf int, data byte) {
-	m.Slots[Slot(buf)] = append(m.Slots[Slot(buf)], data)
+	m.Slots[BufSlot(buf)] = append(m.Slots[BufSlot(buf)], data)
 	m.Pointers[buf]++
 }
 
 func (m *Memory) Clear(buf int) {
-	slot := Slot(buf)
+	slot := BufSlot(buf)
 	m.Slots[slot] = m.Slots[slot][:0]
 	m.Reset(buf)
 }

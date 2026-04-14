@@ -9,8 +9,8 @@ import (
 
 func TestG(t *testing.T) {
 	memory := mem.New()
-	memory.Set(mem.Slot(mem.Transmit), []byte("HELLO"))
+	memory.Set(mem.BufSlot(mem.Transmit), []byte("HELLO"))
 
 	NewG(memory).Run([]string{})
-	assert.Equal(t, []byte{}, memory.Get(mem.Slot(mem.Transmit)))
+	assert.Equal(t, []byte{}, memory.Get(mem.BufSlot(mem.Transmit)))
 }

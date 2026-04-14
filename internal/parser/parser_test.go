@@ -7,13 +7,13 @@ import (
 	"github.com/thorntonrose/device/internal/etc"
 )
 
-func TestSlot(t *testing.T) {
-	assert.Equal(t, 1, Slot("001"))
+func TestBufSlot(t *testing.T) {
+	assert.Equal(t, 1, BufSlot("001"))
 }
 
 func TestSlot_Invalid(t *testing.T) {
-	assert.Equal(t, 1, Slot("1"))
-	assert.PanicsWithValue(t, "invalid slot: A", func() { Slot("A") })
+	assert.Equal(t, 1, BufSlot("1"))
+	assert.PanicsWithValue(t, "invalid slot: A", func() { BufSlot("A") })
 }
 
 func TestText(t *testing.T) {

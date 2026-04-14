@@ -12,7 +12,7 @@ func TestAt(t *testing.T) {
 	memory.Set(20, []byte("HELLO"))
 
 	assert.Equal(t, 0, NewA(memory).Run([]string{"20", "0"}))
-	assert.Equal(t, []byte("HELLO"), memory.Get(mem.Slot(mem.Transmit)))
+	assert.Equal(t, []byte("HELLO"), memory.Get(mem.BufSlot(mem.Transmit)))
 }
 
 func TestA_Skip(t *testing.T) {

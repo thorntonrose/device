@@ -25,7 +25,7 @@ func TestB_Set(t *testing.T) {
 
 func TestB_Clear(t *testing.T) {
 	memory := mem.New()
-	memory.Slots[mem.Slot(mem.Receive)] = []byte("HELLO")
+	memory.Slots[mem.BufSlot(mem.Receive)] = []byte("HELLO")
 	memory.Pointers[mem.Receive] = 5
 
 	NewB(memory).Run([]string{"9"})
