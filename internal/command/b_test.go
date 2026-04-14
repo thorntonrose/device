@@ -10,7 +10,7 @@ import (
 func TestB_NoChange(t *testing.T) {
 	memory := mem.New()
 
-	NewB(&memory).Run(Parameters{})
+	NewB(memory).Run([]string{})
 	assert.Equal(t, mem.Receive, memory.Source)
 	assert.Equal(t, mem.Transmit, memory.Destination)
 }
@@ -18,7 +18,7 @@ func TestB_NoChange(t *testing.T) {
 func TestB_Set(t *testing.T) {
 	memory := mem.New()
 
-	NewB(&memory).Run(Parameters{1, 2})
+	NewB(memory).Run([]string{"1", "2"})
 	assert.Equal(t, mem.Transmit, memory.Source)
 	assert.Equal(t, mem.Receive, memory.Destination)
 }
@@ -26,8 +26,8 @@ func TestB_Set(t *testing.T) {
 func TestB_Clear(t *testing.T) {
 	memory := mem.New()
 	memory.Slots[mem.Slot(mem.Receive)] = []byte("HELLO")
-	memory.ReadPointers[mem.Slot(mem.Receive)] = 5
+	memory.Get(mem.Pointers)[mem.Receive] = 5
 
-	NewB(&memory).Run(Parameters{9})
-	assert.Equal(t, 0, memory.ReadPointers[mem.Receive-1])
+	NewB(memory).Run([]string{"9"})
+	assert.Equal(t, byte(0), memory.Get(mem.Pointers)[mem.Receive])
 }

@@ -8,34 +8,32 @@ import (
 	"github.com/thorntonrose/device/internal/script"
 )
 
-// syntax:
+const (
+	CommentMarker = ";"
+	SlotLength    = 3
+)
+
+// Syntax:
 //
 // <program> ::= <statement>+
 // <statement> ::= (<comment> | <assignment> | <script>)+
 // <comment> ::= ';'[<text>]<newline>
 //
 // <assignment> ::= <slot>'='<text><eol>
-// <slot> ::= <digit>+
+// <slot> ::= ['0']*<digit>+
 //
-// <script> ::= (<slot>'$'(<command>[<eol>])+
-// <command> ::= <space>*<operation>[<parameters>]
-// <operation> ::= ['+' | '*']'A'...'Z'
+// <script> ::= (<slot>'$'(<space>*<command>[<eol>])+
+// <command> ::= ['+' | '*']<'A'..'Z'>[<parameters>]
 // <parameters> ::= <parameter>('.'<parameter>)*
-// <parameter> ::= <number> | <variable>
-// <variable> ::= #<digit>
+// <parameter> ::= (['-' | '#']<number>) | "'"<text>"'"
 //
 // <eol> ::= <comment> | <newline>
 //
-// example:
+// Example:
 //
 // 002=HELLO
+// 003=123
 // 020$X
-
-const (
-	CommentMarker = ";"
-	SlotLength    = 3
-)
-
 func Parse(program string) map[int][]byte {
 	data := map[int][]byte{}
 	lines := strings.Split(program, "\n")

@@ -8,21 +8,21 @@ import (
 )
 
 type Device struct {
-	Memory   mem.Memory
-	Commands map[string]command.Runner
-	Script   script.Script
+	Memory  mem.Memory
+	Runners map[string]script.Runner
+	Script  script.Script
 }
 
 func New() Device {
 	d := Device{Memory: mem.New()}
-	d.Commands = NewCommands(&d.Memory)
-	d.Script = script.New(&d.Memory, d.Commands)
+	d.Runners = NewCommands(d.Memory)
+	d.Script = script.New(d.Memory, d.Runners)
 
 	return d
 }
 
-func NewCommands(memory *mem.Memory) map[string]command.Runner {
-	return map[string]command.Runner{
+func NewCommands(memory mem.Memory) map[string]script.Runner {
+	return map[string]script.Runner{
 		"X": command.NewX(memory),
 	}
 }

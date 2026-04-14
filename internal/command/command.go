@@ -1,20 +1,24 @@
 package command
 
-import "github.com/thorntonrose/device/internal/mem"
+import (
+	"fmt"
+	"strconv"
+
+	"github.com/thorntonrose/device/internal/etc"
+	"github.com/thorntonrose/device/internal/mem"
+)
 
 type Command struct {
-	Memory *mem.Memory
-	Runner
+	Memory mem.Memory
 }
 
-func New(memory *mem.Memory) Command {
+func New(memory mem.Memory) Command {
 	return Command{Memory: memory}
 }
 
-type Runner interface {
-	Run(parameters Parameters)
+func (c Command) ToInt(name string, parameters []string, index int, def int) int {
+	defer etc.Recover(func(e error) { panic(fmt.Sprintf("invalid %s: %v", name, parameters)) })
+	defString := fmt.Sprintf("%d", def)
+
+	return etc.If(len(parameters) > index, etc.Must(strconv.Atoi(etc.Value(parameters[index], defString))), def)
 }
-
-//-----------------------------------------------------------------------------
-
-type Parameters [mem.MaxVariables]int

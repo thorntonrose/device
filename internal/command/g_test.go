@@ -11,6 +11,6 @@ func TestG(t *testing.T) {
 	memory := mem.New()
 	memory.Set(mem.Slot(mem.Transmit), []byte("HELLO"))
 
-	NewG(&memory).Run(Parameters{})
+	NewG(memory).Run([]string{})
 	assert.Equal(t, []byte{}, memory.Get(mem.Slot(mem.Transmit)))
 }

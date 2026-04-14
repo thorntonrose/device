@@ -11,6 +11,8 @@ func TestX(t *testing.T) {
 	memory := mem.New()
 	memory.Set(mem.Slot(mem.Receive), []byte("HELLO"))
 
-	NewX(&memory).Run(Parameters{0, 0})
+	NewX(memory).Run([]string{})
 	assert.Equal(t, []byte("HELLO"), memory.Get(mem.Slot(mem.Transmit)))
 }
+
+// ???: Need more tests.

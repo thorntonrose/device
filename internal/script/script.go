@@ -2,41 +2,49 @@ package script
 
 import (
 	"regexp"
-	"strconv"
 	"strings"
 
-	"github.com/thorntonrose/device/internal/command"
 	"github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
 )
 
-var CommandPattern = regexp.MustCompile(`(\*|\+)?([A-Z])([0-9\.])*`)
+// syntax: ['*'|'+']<letter>[<parameter>(.<parameter>)*]
+// A*B1+C1.-2.#3.'A1!'D.1E..2 => A, *B1, +C1.-2.#3.'A1!', D.1, E..2
+var CommandPattern = regexp.MustCompile(`([*+]?[A-Z])((?:[-#]?\d+|'[^']*'|)(?:\.(?:[-#]?\d+|'[^']*'|))*)?`)
 
 type Script struct {
-	Memory   *mem.Memory
-	Commands map[string]command.Runner
+	Memory  mem.Memory
+	Runners map[string]Runner
 }
 
-func New(memory *mem.Memory, commands map[string]command.Runner) Script {
-	return Script{Memory: memory, Commands: commands}
+type Runner interface {
+	Run(parameters []string) (skip int)
 }
 
-func (s Script) Run(slot int) {
-	etc.Each(CommandPattern.FindAllStringSubmatch(string(s.Memory.Get(slot)), -1), func(tokens []string) {
-		s.RunCommand(tokens[1]+tokens[2], tokens[3])
-	})
+func New(memory mem.Memory, runners map[string]Runner) Script {
+	return Script{Memory: memory, Runners: runners}
 }
 
-func (s Script) RunCommand(name string, token string) {
-	s.Commands[name].Run(s.ToParameters(token))
+func (s Script) Run(slot int) int {
+	commands := s.Commands(slot)
+	index := 0
+
+	for index >= 0 && index < len(commands) {
+		index = s.Next(index, s.RunCommand(commands[index]))
+	}
+
+	return index
 }
 
-func (s Script) ToParameters(token string) (parameters command.Parameters) {
-	etc.EachWithIndex(strings.Split(token, "."), func(val string, i int) { parameters[i] = s.ToInt(val) })
-	return parameters
+func (s Script) Commands(slot int) [][]string {
+	// expect: [<match>, <modifier><letter>, <parameters>]
+	return CommandPattern.FindAllStringSubmatch(string(s.Memory.Get(slot)), -1)
 }
 
-func (s Script) ToInt(val string) int {
-	defer etc.Recover(func(e error) { panic("invalid parameter: " + val) })
-	return etc.Must(strconv.Atoi(etc.Value(val, "0")))
+func (s Script) Next(index int, skip int) int {
+	return etc.If(skip == 0, index+1, etc.If(skip > 0, index+1+skip, index+skip))
+}
+
+func (s Script) RunCommand(tokens []string) int {
+	return s.Runners[tokens[1]].Run(strings.Split(tokens[2], "."))
 }
