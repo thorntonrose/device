@@ -2,6 +2,7 @@ package command
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/thorntonrose/device/internal/mem"
 )
@@ -10,17 +11,18 @@ type P struct {
 	Command
 }
 
-// P[<m>] -- display contents of memory slot
+// P<m> -- display contents of memory slot
 // m: memory slot (default: 0)
-func NewP(memory mem.Memory) P {
+func NewP(memory *mem.Memory) P {
 	return P{New(memory)}
 }
 
 func (c P) Run(parameters []string) int {
-	fmt.Println(c.ReadAll(parameters))
+	fmt.Fprintln(os.Stderr, c.Get(parameters))
 	return 0
 }
 
-func (c P) ReadAll(parameters []string) string {
-	return string(c.Memory.Get(c.ToInt("slot (m)", parameters, 0, 0)))
+func (c P) Get(parameters []string) string {
+	m := c.Int("m (memory slot)", parameters, 0, 0)
+	return string(c.Memory.Get(m))
 }

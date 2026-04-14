@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"log"
 	"strconv"
 	"strings"
 
@@ -35,12 +36,15 @@ const (
 // 003=123
 // 020$X
 func Parse(program string) map[int][]byte {
+	log.Printf("Parse ...")
 	data := map[int][]byte{}
 	lines := strings.Split(program, "\n")
 	index := 0
 
 	for index < len(lines) {
+		log.Printf("parser.Parse: line: %d, %s", index, lines[index])
 		newIndex, slot, value := Statement(lines, index)
+		log.Printf("parser.Parse: slot: %d, value: %s", slot, value)
 		data[slot] = value
 		index = newIndex
 	}

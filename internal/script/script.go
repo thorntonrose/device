@@ -1,6 +1,7 @@
 package script
 
 import (
+	"log"
 	"regexp"
 	"strings"
 
@@ -13,7 +14,7 @@ import (
 var CommandPattern = regexp.MustCompile(`([*+]?[A-Z])((?:[-#]?\d+|'[^']*'|)(?:\.(?:[-#]?\d+|'[^']*'|))*)?`)
 
 type Script struct {
-	Memory  mem.Memory
+	Memory  *mem.Memory
 	Runners map[string]Runner
 }
 
@@ -21,12 +22,14 @@ type Runner interface {
 	Run(parameters []string) (skip int)
 }
 
-func New(memory mem.Memory, runners map[string]Runner) Script {
+func New(memory *mem.Memory, runners map[string]Runner) Script {
 	return Script{Memory: memory, Runners: runners}
 }
 
 func (s Script) Run(slot int) int {
+	log.Printf("Script.Run: slot: %d", slot)
 	commands := s.Commands(slot)
+	log.Printf("Script.Run: commands: %v", commands)
 	index := 0
 
 	for index >= 0 && index < len(commands) {
@@ -46,5 +49,6 @@ func (s Script) Next(index int, skip int) int {
 }
 
 func (s Script) RunCommand(tokens []string) int {
+	log.Printf("Script.RunCommand: tokens: %v", tokens)
 	return s.Runners[tokens[1]].Run(strings.Split(tokens[2], "."))
 }

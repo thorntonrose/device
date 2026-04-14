@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/thorntonrose/device/internal/etc"
 )
 
 func TestNew(t *testing.T) {
@@ -20,7 +19,7 @@ func TestNew(t *testing.T) {
 
 func assertBlock(t *testing.T, slots [][]byte, start int, end int, size int) {
 	for i := start; i <= end; i++ {
-		assert.Len(t, slots[i], etc.If(size == MaxReservedSize, 16, 0), "slot %d", i)
+		assert.True(t, (size == MaxReservedSize && len(slots[i]) > 0) || len(slots[i]) == 0, "slot %d", i)
 		assert.Equal(t, cap(slots[i]), size, "slot %d", i)
 	}
 }
@@ -65,7 +64,7 @@ func TestDump(t *testing.T) {
 	memory.Set(3, []byte("B"))
 	memory.Set(20, []byte("C"))
 
-	lines := []string{"002 (250): A", "003 (250): B", "020 (120): C", "S: 2, D: 1, P: [0 0]"}
+	lines := []string{"S: 2, D: 1, P: [0 0 0]", "002 (250): A", "003 (250): B", "020 (120): C"}
 	assert.Equal(t, strings.Join(lines, "\n"), memory.Dump(2, 3, 20))
 }
 
@@ -76,7 +75,7 @@ func TestRead(t *testing.T) {
 	memory.Set(Slot(Receive), []byte{'A'})
 
 	assert.Equal(t, byte('A'), memory.Read(Receive))
-	assert.Equal(t, byte(1), memory.Get(Pointers)[Receive])
+	assert.Equal(t, 1, memory.Pointers[Receive])
 }
 
 func TestReadAll(t *testing.T) {

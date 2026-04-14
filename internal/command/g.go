@@ -9,7 +9,7 @@ type G struct {
 	Command
 }
 
-func NewG(memory mem.Memory) G {
+func NewG(memory *mem.Memory) G {
 	return G{New(memory)}
 }
 

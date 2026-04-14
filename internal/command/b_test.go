@@ -19,15 +19,15 @@ func TestB_Set(t *testing.T) {
 	memory := mem.New()
 
 	NewB(memory).Run([]string{"1", "2"})
-	assert.Equal(t, mem.Transmit, memory.Source)
-	assert.Equal(t, mem.Receive, memory.Destination)
+	assert.Equal(t, 1, memory.Source)
+	assert.Equal(t, 2, memory.Destination)
 }
 
 func TestB_Clear(t *testing.T) {
 	memory := mem.New()
 	memory.Slots[mem.Slot(mem.Receive)] = []byte("HELLO")
-	memory.Get(mem.Pointers)[mem.Receive] = 5
+	memory.Pointers[mem.Receive] = 5
 
 	NewB(memory).Run([]string{"9"})
-	assert.Equal(t, byte(0), memory.Get(mem.Pointers)[mem.Receive])
+	assert.Equal(t, 0, memory.Pointers[mem.Receive])
 }

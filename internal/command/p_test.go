@@ -12,6 +12,8 @@ func TestP(t *testing.T) {
 	memory.Set(20, []byte("HELLO"))
 
 	p := NewP(memory)
-	assert.Equal(t, string(memory.Get(0)), p.ReadAll([]string{}))
-	assert.Equal(t, "HELLO", p.ReadAll([]string{"20"}))
+	assert.Equal(t, string(memory.Get(0)), p.Get([]string{}))
+	assert.Equal(t, "HELLO", p.Get([]string{"20"}))
+
+	p.Run([]string{"20"})
 }

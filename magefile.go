@@ -22,8 +22,10 @@ var (
 )
 
 func Clean() {
-	os.RemoveAll(BinDir)
-	os.RemoveAll(TempDir)
+	for _, path := range []string{BinDir, TempDir, "device.log"} {
+		os.RemoveAll(path)
+	}
+
 	bash("go clean -cache")
 }
 

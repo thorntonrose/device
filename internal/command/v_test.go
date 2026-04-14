@@ -17,4 +17,6 @@ func TestV(t *testing.T) {
 	v := NewV(memory)
 	assert.Equal(t, "FOO", v.ReadAll([]string{}))
 	assert.Equal(t, "BAR", v.ReadAll([]string{"2"}))
+
+	v.Run([]string{"2"})
 }

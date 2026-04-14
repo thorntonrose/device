@@ -6,18 +6,24 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/thorntonrose/device/internal/config"
 	"github.com/thorntonrose/device/internal/etc"
 )
 
+const LOG_FILE = "device.log"
+
 func Run() {
+	defer config.InitLogger()()
+
 	slot := flag.Int("slot", 0, "")
 	flag.Usage = Usage
 	flag.Parse()
-	fileName := GetFile()
 
 	device := New()
-	device.Load(string(etc.Must(os.ReadFile(fileName))))
+	device.Load(string(etc.Must(os.ReadFile(GetFile()))))
 	device.Run(*slot)
+
+	// ???: Dump non-empty only?
 	fmt.Println(device.Memory.Dump())
 }
 

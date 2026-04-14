@@ -70,7 +70,7 @@ type S struct {
 	command.Command
 }
 
-func NewS(memory mem.Memory) S {
+func NewS(memory *mem.Memory) S {
 	return S{command.Command{Memory: memory}}
 }
 

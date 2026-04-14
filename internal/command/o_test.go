@@ -14,8 +14,8 @@ func TestO(t *testing.T) {
 	o := NewO(memory)
 
 	o.Run([]string{})
-	assert.Equal(t, byte(1), memory.Get(mem.Pointers)[memory.Source])
+	assert.Equal(t, 1, memory.Pointers[memory.Source])
 
 	o.Run([]string{"1"})
-	assert.Equal(t, byte(2), memory.Get(mem.Pointers)[memory.Source])
+	assert.Equal(t, 2, memory.Pointers[memory.Source])
 }

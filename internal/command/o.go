@@ -4,17 +4,19 @@ import (
 	"github.com/thorntonrose/device/internal/mem"
 )
 
-// O[<m>] -- move read pointer
+// O<n> -- move source buffer pointer
 // n: number of characters to move (positive or negative, default: 1)
 type O struct {
 	Command
 }
 
-func NewO(memory mem.Memory) O {
+func NewO(memory *mem.Memory) O {
 	return O{New(memory)}
 }
 
 func (c O) Run(parameters []string) int {
-	c.Memory.Get(mem.Pointers)[c.Memory.Source] += byte(c.ToInt("number to move (n)", parameters, 0, 1))
+	n := c.Int("n (number to move)", parameters, 0, 1)
+	c.Memory.Pointers[c.Memory.Source] += n
+
 	return 0
 }

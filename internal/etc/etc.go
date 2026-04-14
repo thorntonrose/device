@@ -49,6 +49,6 @@ func Recover(fn func(error)) {
 	}
 }
 
-func Value[T any](val T, defaultVal T) T {
-	return If(reflect.ValueOf(val).IsZero(), defaultVal, val)
+func Value[T any](val T, def T) T {
+	return If(reflect.ValueOf(val).IsZero(), def, val)
 }
