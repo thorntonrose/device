@@ -44,8 +44,7 @@ func New() *Memory {
 
 func NewSlots() [][]byte {
 	slots := make([][]byte, MaxSlots)
-	slots[0] = make([]byte, MaxBuffers+1, MaxReservedSize)
-	AddBlock(&slots, 1, 1, MaxReservedSize)
+	AddBlock(&slots, 0, 1, MaxReservedSize)
 	AddBlock(&slots, 2, 3, MaxBufferSize)
 	AddBlock(&slots, 4, 19, MaxReservedSize)
 	AddBlock(&slots, 20, 39, MaxGeneralSize)

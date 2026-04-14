@@ -10,8 +10,7 @@ import (
 func TestNew(t *testing.T) {
 	memory := New()
 	assert.Len(t, memory.Slots, MaxSlots)
-	assert.Len(t, memory.Slots[0], MaxBuffers+1)
-	assertBlock(t, memory.Slots, 1, 1, MaxReservedSize)
+	assertBlock(t, memory.Slots, 0, 1, MaxReservedSize)
 	assertBlock(t, memory.Slots, 2, 3, MaxBufferSize)
 	assertBlock(t, memory.Slots, 4, 19, MaxReservedSize)
 	assertBlock(t, memory.Slots, 20, 39, MaxGeneralSize)
