@@ -16,6 +16,7 @@ func NewX(memory *mem.Memory) X {
 func (x X) Run(parameters []string) int {
 	n := x.Int("n (number to copy)", parameters, 0, 0)
 	c := x.Int("c (stop character)", parameters, 1, 0)
+	// ???: Should start from read pointer.
 	x.Memory.WriteAll(x.Memory.Destination, x.Memory.ReadAll(x.Memory.Source, n, byte(c)))
 
 	return 0

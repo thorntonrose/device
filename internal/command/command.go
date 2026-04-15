@@ -1,3 +1,4 @@
+// ???: Move this and commands to script package?
 package command
 
 import (

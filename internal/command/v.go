@@ -27,5 +27,6 @@ func (c V) Run(parameters []string) int {
 
 func (c V) ReadAll(parameters []string) string {
 	b := c.Int("b (buffer)", parameters, 0, mem.Transmit)
+	// ???: Should start from read pointer, unless buffer = destination buffer.
 	return string(c.Memory.ReadAll(b, 0, 0))
 }

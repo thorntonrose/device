@@ -5,12 +5,6 @@ import (
 	"reflect"
 )
 
-func Check(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func Each[T any](list []T, fn func(T)) {
 	for _, item := range list {
 		fn(item)
@@ -29,12 +23,12 @@ func EachEntry[K comparable, V any](dict map[K]V, fn func(K, V)) {
 	}
 }
 
-func If[T any](condition bool, trueVal T, falseVal T) T {
-	if condition {
-		return trueVal
-	}
+//-----------------------------------------------------------------------------
 
-	return falseVal
+func Check(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
 
 func Must[T any](val T, err error) T {
@@ -47,6 +41,16 @@ func Recover(fn func(error)) {
 		e, ok := r.(error)
 		fn(If(ok, e, fmt.Errorf("%v", r)))
 	}
+}
+
+//-----------------------------------------------------------------------------
+
+func If[T any](condition bool, trueVal T, falseVal T) T {
+	if condition {
+		return trueVal
+	}
+
+	return falseVal
 }
 
 func Value[T any](val T, def T) T {
