@@ -1,4 +1,4 @@
-package command
+package script
 
 import (
 	"github.com/thorntonrose/device/internal/mem"
@@ -12,7 +12,7 @@ type A struct {
 }
 
 func NewA(memory *mem.Memory) A {
-	return A{New(memory)}
+	return A{NewCommand(memory)}
 }
 
 func (c A) Run(parameters []string) (skip int) {

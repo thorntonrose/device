@@ -1,5 +1,5 @@
 // ???: Move this and commands to script package?
-package command
+package script
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ type Command struct {
 	Memory *mem.Memory
 }
 
-func New(memory *mem.Memory) Command {
+func NewCommand(memory *mem.Memory) Command {
 	return Command{Memory: memory}
 }
 

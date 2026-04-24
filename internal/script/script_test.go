@@ -5,13 +5,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/thorntonrose/device/internal/command"
 	"github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
 )
 
 func TestNext(t *testing.T) {
-	script := New(mem.New(), nil)
+	script := NewScript(mem.New())
 	assert.Equal(t, 1, script.Next(0, 0))
 	assert.Equal(t, 2, script.Next(0, 1))
 	assert.Equal(t, -1, script.Next(0, -1))
@@ -21,37 +20,32 @@ func TestCommands(t *testing.T) {
 	memory := mem.New()
 	memory.Set(20, []byte("A*B1+C1.-2.#3.'A1!'D.1E..2"))
 
-	commands := New(memory, nil).Commands(20)
-	assert.Equal(t, [][]string{
-		{"A", "A", ""},
-		{"*B1", "*B", "1"},
-		{"+C1.-2.#3.'A1!'", "+C", "1.-2.#3.'A1!'"},
-		{"D.1", "D", ".1"},
-		{"E..2", "E", "..2"},
-	}, commands)
+	commands := NewScript(memory).Commands(20)
+	assert.Equal(t, [][]string{{"A", "A", ""}, {"*B1", "*B", "1"}, {"+C1.-2.#3.'A1!'", "+C", "1.-2.#3.'A1!'"},
+		{"D.1", "D", ".1"}, {"E..2", "E", "..2"}}, commands)
 }
 
 func TestRunCommand(t *testing.T) {
 	memory := mem.New()
 	memory.Set(mem.BufSlot(mem.Receive), []byte("HELLO"))
 
-	script := New(memory, map[string]Runner{"S": NewS(memory)})
-	assert.Equal(t, 1, script.RunCommand([]string{"S1.1", "S", "1.1"}))
+	script := NewTestScript(memory)
+	assert.Equal(t, 1, script.RunCommand([]string{"Z1.1", "Z", "1.1"}))
 	assert.Equal(t, []byte("1"), memory.Get(mem.BufSlot(mem.Transmit)))
 }
 
 func TestRun(t *testing.T) {
 	memory := mem.New()
 	memory.Set(mem.BufSlot(mem.Receive), []byte("HELLO"))
-	memory.Set(20, []byte("S0S0"))
+	memory.Set(20, []byte("Z0Z0"))
 
-	index := New(memory, map[string]Runner{"S": NewS(memory)}).Run(20)
+	index := NewTestScript(memory).Run(20)
 	assert.Equal(t, 2, index)
 }
 
 func TestRun_Skip(t *testing.T) {
-	AssertSkip(t, "S1X", 2)
-	AssertSkip(t, "S-1X", -1)
+	AssertSkip(t, "Z1X", 2)
+	AssertSkip(t, "Z-1X", -1)
 }
 
 func AssertSkip(t *testing.T, text string, expectedIndex int) {
@@ -59,24 +53,31 @@ func AssertSkip(t *testing.T, text string, expectedIndex int) {
 	memory.Set(mem.BufSlot(mem.Receive), []byte("HELLO"))
 	memory.Set(20, []byte(text))
 
-	index := New(memory, map[string]Runner{"S": NewS(memory)}).Run(20)
+	index := NewTestScript(memory).Run(20)
 	assert.Equal(t, []byte{}, memory.Get(mem.BufSlot(mem.Transmit)))
 	assert.Equal(t, expectedIndex, index)
 }
 
 //-----------------------------------------------------------------------------
 
-type S struct {
-	command.Command
+func NewTestScript(memory *mem.Memory) Script {
+	script := NewScript(memory)
+	script.Runners = map[string]Runner{"Z": NewZ(memory)}
+
+	return script
 }
 
-func NewS(memory *mem.Memory) S {
-	return S{command.Command{Memory: memory}}
+type Z struct {
+	Command
 }
 
-func (s S) Run(parameters []string) int {
+func NewZ(memory *mem.Memory) Z {
+	return Z{NewCommand(memory)}
+}
+
+func (z Z) Run(parameters []string) int {
 	if len(parameters) > 1 {
-		s.Memory.Set(mem.BufSlot(mem.Transmit), []byte(parameters[1]))
+		z.Memory.Set(mem.BufSlot(mem.Transmit), []byte(parameters[1]))
 	}
 
 	return etc.Must(strconv.Atoi(parameters[0]))

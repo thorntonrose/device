@@ -22,9 +22,17 @@ type Runner interface {
 	Run(parameters []string) (skip int)
 }
 
-func New(memory *mem.Memory, runners map[string]Runner) Script {
-	return Script{Memory: memory, Runners: runners}
+func NewScript(memory *mem.Memory) Script {
+	return Script{Memory: memory, Runners: NewCommands(memory)}
 }
+
+func NewCommands(memory *mem.Memory) map[string]Runner {
+	return map[string]Runner{
+		"X": NewX(memory),
+	}
+}
+
+//-----------------------------------------------------------------------------
 
 func (s Script) Run(slot int) int {
 	log.Printf("Script.Run: slot: %d", slot)
