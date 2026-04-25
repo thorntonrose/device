@@ -8,15 +8,20 @@ import (
 )
 
 func TestV(t *testing.T) {
-	memory := mem.New()
-	memory.WriteAll(mem.Transmit, []byte("FOO"))
-	memory.Reset(mem.Transmit)
-	memory.WriteAll(mem.Receive, []byte("BAR"))
-	memory.Reset(mem.Receive)
+	v := NewV(mem.New())
+	*v.Memory.Buffers[mem.Transmit] = []byte("FOO")
+	*v.Memory.Buffers[mem.Receive] = []byte("BAR")
 
-	v := NewV(memory)
-	assert.Equal(t, "FOO", v.ReadAll([]string{}))
-	assert.Equal(t, "BAR", v.ReadAll([]string{"2"}))
+	assert.Equal(t, "FOO", v.Get([]string{}))
+	assert.Equal(t, "BAR", v.Get([]string{"2"}))
 
 	v.Run([]string{"2"})
+}
+
+func TestV_InvalidParameters(t *testing.T) {
+	memory := mem.New()
+	v := NewV(memory)
+
+	assert.Panics(t, func() { v.Run([]string{"A"}) })
+	assert.Panics(t, func() { v.Run([]string{"6"}) })
 }

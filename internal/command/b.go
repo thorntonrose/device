@@ -1,18 +1,13 @@
 package command
 
 import (
-	"fmt"
-
 	"github.com/thorntonrose/device/internal/mem"
 )
 
-// B<b1>.<b2> -- Set source and destination buffers
-// b1: source buffer (0 - <max-buffers> | 9, default: 0)
-// b2: destination buffer (0 - <max-buffers> | 9, default: 0)
+// B[b1.b2] -- Set source and destination buffers
 //
-// 0 = no change
-// 1 - <max-buffers> = set buffer; reset pointer
-// 9 = reset pointer
+// b1: source buffer (0 - 5 | 9, default: 0); 0 = no change, 1 - 5 = set buffer and reset pointer; 9 = reset pointer
+// b2: destination buffer (0 - 5 | 9, default: 0); 0 = no change, 1 - 5 = set buffer
 type B struct {
 	Command
 }
@@ -21,35 +16,25 @@ func NewB(memory *mem.Memory) B {
 	return B{New(memory)}
 }
 
-func (c B) Run(parameters []string) int {
-	b1 := c.Buffer("b1 (source)", parameters, 0)
-	b2 := c.Buffer("b2 (destination)", parameters, 1)
-	c.Set(&c.Memory.Source, b1)
-	c.Set(&c.Memory.Destination, b2)
+func (self B) Run(parameters []string) int {
+	b1 := self.Code("b1 (source)", parameters, 0, 0, []int{0, 1, 2, 3, 4, 5, 9})
+	b2 := self.Code("b2 (destination)", parameters, 1, 0, []int{0, 1, 2, 3, 4, 5})
+	self.SetSource(b1)
+	self.SetDestination(b2)
 
 	return 0
 }
 
-func (c B) Set(buf *int, b int) {
-	if b > 0 && b < 9 {
-		*buf = b
+func (self B) SetSource(b int) {
+	if b > 0 && b != 9 {
+		self.Memory.Source = b
 	}
 
-	c.Reset(*buf, b)
+	self.Memory.Reset(self.Memory.Source)
 }
 
-func (c B) Reset(buf int, b int) {
-	if b == 9 {
-		c.Memory.Reset(buf)
+func (self B) SetDestination(b int) {
+	if b > 0 {
+		self.Memory.Destination = b
 	}
-}
-
-func (c B) Buffer(name string, parameters []string, index int) int {
-	buf := c.Int(name, parameters, index, 0)
-
-	if (buf >= 0 && buf <= mem.MaxBuffers) || buf == 9 {
-		return buf
-	}
-
-	panic(fmt.Sprintf("invalid: %s: %d", name, buf))
 }

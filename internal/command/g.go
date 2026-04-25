@@ -13,7 +13,7 @@ func NewG(memory *mem.Memory) G {
 	return G{New(memory)}
 }
 
-func (g G) Run(_ []string) int {
-	g.Memory.Clear(g.Memory.Destination)
+func (self G) Run(_ []string) int {
+	self.Memory.Clear(self.Memory.Destination)
 	return 0
 }

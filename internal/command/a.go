@@ -4,7 +4,8 @@ import (
 	"github.com/thorntonrose/device/internal/mem"
 )
 
-// A<m>.<s> -- append data to destination buffer
+// A[m.s] -- append data to destination buffer
+//
 // m: memory slot (default: 0)
 // s: commands to skip if slot is empty (default: 0)
 type A struct {
@@ -15,16 +16,16 @@ func NewA(memory *mem.Memory) A {
 	return A{New(memory)}
 }
 
-func (c A) Run(parameters []string) (skip int) {
-	m := c.Int("m (memory slot)", parameters, 0, 0)
-	s := c.Int("s (skip)", parameters, 1, 0)
-	c.WriteAll(m)
+func (self A) Run(parameters []string) (skip int) {
+	m := self.Range("m (memory slot)", parameters, 0, 0, 0, mem.MaxSlots-1)
+	s := self.Int("s (skip)", parameters, 1, 0)
+	self.WriteAll(m)
 
 	return s
 }
 
-func (c A) WriteAll(m int) {
-	if data := c.Memory.Get(m); len(data) > 0 {
-		c.Memory.WriteAll(c.Memory.Destination, data)
+func (self A) WriteAll(m int) {
+	if data := self.Memory.Slots[m]; len(data) > 0 {
+		self.Memory.WriteAll(self.Memory.Destination, data)
 	}
 }

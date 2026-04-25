@@ -12,8 +12,15 @@ func TestP(t *testing.T) {
 	memory.Set(20, []byte("HELLO"))
 
 	p := NewP(memory)
-	assert.Equal(t, string(memory.Get(0)), p.Get([]string{}))
+	assert.Equal(t, string(memory.Slots[0]), p.Get([]string{}))
 	assert.Equal(t, "HELLO", p.Get([]string{"20"}))
 
 	p.Run([]string{"20"})
+}
+
+func TestP_InvalidParameters(t *testing.T) {
+	memory := mem.New()
+	p := NewP(memory)
+
+	assert.Panics(t, func() { p.Run([]string{"A"}) })
 }

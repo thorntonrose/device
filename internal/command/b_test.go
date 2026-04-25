@@ -25,9 +25,18 @@ func TestB_Set(t *testing.T) {
 
 func TestB_Clear(t *testing.T) {
 	memory := mem.New()
-	memory.Slots[mem.BufSlot(mem.Receive)] = []byte("HELLO")
+	memory.Slots[mem.Receive+1] = []byte("HELLO")
 	memory.Pointers[mem.Receive] = 5
 
 	NewB(memory).Run([]string{"9"})
 	assert.Equal(t, 0, memory.Pointers[mem.Receive])
+}
+
+func TestB_InvalidParameters(t *testing.T) {
+	memory := mem.New()
+
+	assert.Panics(t, func() { NewB(memory).Run([]string{"A"}) })
+	assert.Panics(t, func() { NewB(memory).Run([]string{"6"}) })
+	assert.Panics(t, func() { NewB(memory).Run([]string{"0", "A"}) })
+	assert.Panics(t, func() { NewB(memory).Run([]string{"0", "6"}) })
 }

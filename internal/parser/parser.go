@@ -1,7 +1,9 @@
 package parser
 
 import (
+	"fmt"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -13,6 +15,8 @@ const (
 	CommentMarker = ";"
 	SlotLength    = 3
 )
+
+var SingleCommandPattern = regexp.MustCompile(`^` + script.CommandPattern.String() + `$`)
 
 // Syntax:
 //
@@ -26,7 +30,7 @@ const (
 // <script> ::= (<slot>'$'(<space>*<command>[<eol>])+
 // <command> ::= ['+' | '*']<'A'..'Z'>[<parameters>]
 // <parameters> ::= <parameter>('.'<parameter>)*
-// <parameter> ::= (['-' | '#']<number>) | "'"<text>"'"
+// <parameter> ::= '#'<digit> | ['-']<integer> | "'"<text>"'"
 //
 // <eol> ::= <comment> | <newline>
 //
@@ -35,6 +39,7 @@ const (
 // 002=HELLO
 // 003=123
 // 020$X
+// 021$X1.-2.#3.'A1!' ; not a real command
 func Parse(program string) map[int][]byte {
 	log.Printf("Parse ...")
 	data := map[int][]byte{}
@@ -43,9 +48,11 @@ func Parse(program string) map[int][]byte {
 
 	for index < len(lines) {
 		log.Printf("parser.Parse: line: %d, %s", index, lines[index])
-		newIndex, slot, value := Statement(lines, index)
-		log.Printf("parser.Parse: slot: %d, value: %s", slot, value)
-		data[slot] = value
+
+		newIndex, slotNum, value := Statement(lines, index)
+		log.Printf("parser.Parse: slot: %d, value: %s", slotNum, value)
+
+		data[slotNum] = value
 		index = newIndex
 	}
 
@@ -83,13 +90,13 @@ func Directive(lines []string, index int) (int, int, []byte) {
 
 func Assignment(line string, sep string) (int, []byte) {
 	if tokens := strings.SplitN(line, sep, 2); len(tokens) == 2 {
-		return BufSlot(tokens[0]), Text(tokens[1])
+		return BufSlotNum(tokens[0]), Text(tokens[1])
 	}
 
 	return 0, nil
 }
 
-func BufSlot(token string) int {
+func BufSlotNum(token string) int {
 	defer etc.Recover(func(e error) { panic("invalid slot: " + token) })
 	return etc.Must(strconv.Atoi(etc.Value(token, "0")))
 }
@@ -111,25 +118,18 @@ func Script(lines []string, index int) (int, int, []byte) {
 	panic("invalid directive: " + line)
 }
 
-func Commands(lines []string, index int, slot int, value []byte) (int, int, []byte) {
+func Commands(lines []string, index int, slotNum int, value []byte) (int, int, []byte) {
 	for index < len(lines) {
 		value = append(value, Command(string(Text(lines[index])))...)
 		index++
 	}
 
-	return index, slot, value
+	return index, slotNum, value
 }
 
 func Command(line string) []byte {
 	line = strings.TrimSpace(line)
+	etc.Assert(line == "" || SingleCommandPattern.MatchString(line), fmt.Sprintf("invalid command: %s", line))
 
-	if line == "" || script.CommandPattern.MatchString(line) {
-		return []byte(line)
-	}
-
-	panic("invalid command: " + line)
-}
-
-func IsCommand(line string) bool {
-	return script.CommandPattern.MatchString(line)
+	return []byte(line)
 }

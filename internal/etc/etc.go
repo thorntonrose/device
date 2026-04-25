@@ -23,7 +23,19 @@ func EachEntry[K comparable, V any](dict map[K]V, fn func(K, V)) {
 	}
 }
 
+func Times(n int, fn func(int)) {
+	for i := 0; i < n; i++ {
+		fn(i)
+	}
+}
+
 //-----------------------------------------------------------------------------
+
+func Assert(condition bool, message string) {
+	if !condition {
+		panic(message)
+	}
+}
 
 func Check(err error) {
 	if err != nil {

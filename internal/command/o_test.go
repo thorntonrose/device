@@ -9,7 +9,7 @@ import (
 
 func TestO(t *testing.T) {
 	memory := mem.New()
-	memory.Set(mem.BufSlot(mem.Receive), []byte("HELLO"))
+	memory.Set(mem.Receive+1, []byte("HELLO"))
 
 	o := NewO(memory)
 
@@ -18,4 +18,11 @@ func TestO(t *testing.T) {
 
 	o.Run([]string{"1"})
 	assert.Equal(t, 2, memory.Pointers[memory.Source])
+}
+
+func TestO_InvalidParameters(t *testing.T) {
+	memory := mem.New()
+	o := NewO(memory)
+
+	assert.Panics(t, func() { o.Run([]string{"A"}) })
 }

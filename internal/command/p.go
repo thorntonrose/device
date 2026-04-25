@@ -7,22 +7,23 @@ import (
 	"github.com/thorntonrose/device/internal/mem"
 )
 
+// P[m] -- display contents of memory slot
+//
+// m: memory slot (default: 0)
 type P struct {
 	Command
 }
 
-// P<m> -- display contents of memory slot
-// m: memory slot (default: 0)
 func NewP(memory *mem.Memory) P {
 	return P{New(memory)}
 }
 
-func (c P) Run(parameters []string) int {
-	fmt.Fprintln(os.Stderr, c.Get(parameters))
+func (self P) Run(parameters []string) int {
+	fmt.Fprintln(os.Stderr, self.Get(parameters))
 	return 0
 }
 
-func (c P) Get(parameters []string) string {
-	m := c.Int("m (memory slot)", parameters, 0, 0)
-	return string(c.Memory.Get(m))
+func (self P) Get(parameters []string) string {
+	m := self.Range("m (memory slot)", parameters, 0, 0, 0, mem.MaxSlots-1)
+	return string(self.Memory.Slots[m])
 }

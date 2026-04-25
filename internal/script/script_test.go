@@ -33,16 +33,16 @@ func TestCommands(t *testing.T) {
 
 func TestRunCommand(t *testing.T) {
 	memory := mem.New()
-	memory.Set(mem.BufSlot(mem.Receive), []byte("HELLO"))
+	memory.Set(mem.Receive+1, []byte("HELLO"))
 
 	script := New(memory, map[string]Runner{"S": NewS(memory)})
 	assert.Equal(t, 1, script.RunCommand([]string{"S1.1", "S", "1.1"}))
-	assert.Equal(t, []byte("1"), memory.Get(mem.BufSlot(mem.Transmit)))
+	assert.Equal(t, []byte("1"), *memory.Buffers[mem.Transmit])
 }
 
 func TestRun(t *testing.T) {
 	memory := mem.New()
-	memory.Set(mem.BufSlot(mem.Receive), []byte("HELLO"))
+	memory.Set(mem.Receive+1, []byte("HELLO"))
 	memory.Set(20, []byte("S0S0"))
 
 	index := New(memory, map[string]Runner{"S": NewS(memory)}).Run(20)
@@ -56,11 +56,11 @@ func TestRun_Skip(t *testing.T) {
 
 func AssertSkip(t *testing.T, text string, expectedIndex int) {
 	memory := mem.New()
-	memory.Set(mem.BufSlot(mem.Receive), []byte("HELLO"))
+	memory.Set(mem.Receive+1, []byte("HELLO"))
 	memory.Set(20, []byte(text))
 
 	index := New(memory, map[string]Runner{"S": NewS(memory)}).Run(20)
-	assert.Equal(t, []byte{}, memory.Get(mem.BufSlot(mem.Transmit)))
+	assert.Equal(t, []byte{}, *memory.Buffers[mem.Transmit])
 	assert.Equal(t, expectedIndex, index)
 }
 
@@ -74,9 +74,9 @@ func NewS(memory *mem.Memory) S {
 	return S{command.Command{Memory: memory}}
 }
 
-func (s S) Run(parameters []string) int {
+func (self S) Run(parameters []string) int {
 	if len(parameters) > 1 {
-		s.Memory.Set(mem.BufSlot(mem.Transmit), []byte(parameters[1]))
+		*self.Memory.Buffers[mem.Transmit] = []byte(parameters[1])
 	}
 
 	return etc.Must(strconv.Atoi(parameters[0]))

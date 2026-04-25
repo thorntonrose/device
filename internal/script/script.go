@@ -11,7 +11,10 @@ import (
 
 // syntax: ['*'|'+']<letter>[<parameter>(.<parameter>)*]
 // A*B1+C1.-2.#3.'A1!'D.1E..2 => A, *B1, +C1.-2.#3.'A1!', D.1, E..2
-var CommandPattern = regexp.MustCompile(`([*+]?[A-Z])((?:[-#]?\d+|'[^']*'|)(?:\.(?:[-#]?\d+|'[^']*'|))*)?`)
+var CommandPattern = regexp.MustCompile(`([*+]?[A-Z])((?:#\d|[-]?\d+|'[^']*'|)(?:\.(?:#\d|[-]?\d+|'[^']*'|))*)?`)
+
+// multiple digit variable numbers
+// var CommandPattern = regexp.MustCompile(`([*+]?[A-Z])((?:[-#]?\d+|'[^']*'|)(?:\.(?:[-#]?\d+|'[^']*'|))*)?`)
 
 type Script struct {
 	Memory  *mem.Memory
@@ -26,29 +29,29 @@ func New(memory *mem.Memory, runners map[string]Runner) Script {
 	return Script{Memory: memory, Runners: runners}
 }
 
-func (s Script) Run(slot int) int {
-	log.Printf("Script.Run: slot: %d", slot)
-	commands := s.Commands(slot)
+func (self Script) Run(slotNum int) int {
+	log.Printf("Script.Run: slot: %d", slotNum)
+	commands := self.Commands(slotNum)
 	log.Printf("Script.Run: commands: %v", commands)
 	index := 0
 
 	for index >= 0 && index < len(commands) {
-		index = s.Next(index, s.RunCommand(commands[index]))
+		index = self.Next(index, self.RunCommand(commands[index]))
 	}
 
 	return index
 }
 
-func (s Script) Commands(slot int) [][]string {
+func (self Script) Commands(slotNum int) [][]string {
 	// expect: [<match>, <modifier><letter>, <parameters>]
-	return CommandPattern.FindAllStringSubmatch(string(s.Memory.Get(slot)), -1)
+	return CommandPattern.FindAllStringSubmatch(string(self.Memory.Slots[slotNum]), -1)
 }
 
-func (s Script) Next(index int, skip int) int {
+func (self Script) Next(index int, skip int) int {
 	return etc.If(skip == 0, index+1, etc.If(skip > 0, index+1+skip, index+skip))
 }
 
-func (s Script) RunCommand(tokens []string) int {
+func (self Script) RunCommand(tokens []string) int {
 	log.Printf("Script.RunCommand: tokens: %v", tokens)
-	return s.Runners[tokens[1]].Run(strings.Split(tokens[2], "."))
+	return self.Runners[tokens[1]].Run(strings.Split(tokens[2], "."))
 }

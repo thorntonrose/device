@@ -9,10 +9,17 @@ import (
 
 func TestX(t *testing.T) {
 	memory := mem.New()
-	memory.Set(mem.BufSlot(mem.Receive), []byte("HELLO"))
+	memory.Set(mem.Receive+1, []byte("HELLO"))
 
 	NewX(memory).Run([]string{})
-	assert.Equal(t, []byte("HELLO"), memory.Get(mem.BufSlot(mem.Transmit)))
+	assert.Equal(t, []byte("HELLO"), *memory.Buffers[mem.Transmit])
 }
 
-// ???: Need more tests.
+func TestX_InvalidParameters(t *testing.T) {
+	memory := mem.New()
+	memory.Set(mem.Receive+1, []byte("HELLO"))
+	x := NewX(memory)
+
+	assert.Panics(t, func() { x.Run([]string{"A"}) })
+	assert.Panics(t, func() { x.Run([]string{"0", "A"}) })
+}

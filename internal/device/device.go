@@ -1,8 +1,6 @@
 package device
 
 import (
-	"log"
-
 	"github.com/thorntonrose/device/internal/command"
 	"github.com/thorntonrose/device/internal/mem"
 	"github.com/thorntonrose/device/internal/parser"
@@ -25,18 +23,18 @@ func New() Device {
 
 func NewCommands(memory *mem.Memory) map[string]script.Runner {
 	return map[string]script.Runner{
-		"X": command.NewX(memory),
+		"+I": command.NewPlusI(memory),
+		"X":  command.NewX(memory),
+		"Y":  command.NewY(memory),
 	}
 }
 
 //-----------------------------------------------------------------------------
 
-func (d Device) Load(program string) {
-	log.Println("Device.Load ...")
-	d.Memory.Load(parser.Parse(program))
+func (self Device) Load(program string) {
+	self.Memory.Load(parser.Parse(program))
 }
 
-func (d Device) Run(slot int) {
-	log.Printf("Device.Run: slot: %d", slot)
-	d.Script.Run(slot)
+func (self Device) Run(slotNum int) {
+	self.Script.Run(slotNum)
 }

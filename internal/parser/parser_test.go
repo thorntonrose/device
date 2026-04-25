@@ -7,13 +7,10 @@ import (
 	"github.com/thorntonrose/device/internal/etc"
 )
 
-func TestBufSlot(t *testing.T) {
-	assert.Equal(t, 1, BufSlot("001"))
-}
-
-func TestSlot_Invalid(t *testing.T) {
-	assert.Equal(t, 1, BufSlot("1"))
-	assert.PanicsWithValue(t, "invalid slot: A", func() { BufSlot("A") })
+func TestBufSlotNum(t *testing.T) {
+	assert.Equal(t, 1, BufSlotNum("001"))
+	assert.Equal(t, 1, BufSlotNum("1"))
+	assert.PanicsWithValue(t, "invalid slot: A", func() { BufSlotNum("A") })
 }
 
 func TestText(t *testing.T) {
@@ -28,9 +25,9 @@ func TestAssignment(t *testing.T) {
 	assertAssignment(t, 2, []byte("HELLO"), "002=HELLO")
 }
 
-func assertAssignment(t *testing.T, slot int, value []byte, line string) {
+func assertAssignment(t *testing.T, slotNum int, value []byte, line string) {
 	s, v := Assignment(line, "=")
-	assert.Equal(t, slot, s, line)
+	assert.Equal(t, slotNum, s, line)
 	assert.Equal(t, value, v, line)
 }
 
@@ -44,6 +41,8 @@ func TestCommand(t *testing.T) {
 
 func TestCommand_Invalid(t *testing.T) {
 	assert.PanicsWithValue(t, "invalid command: _", func() { Command("_") })
+	assert.PanicsWithValue(t, "invalid command: A!", func() { Command("A!") })
+	assert.PanicsWithValue(t, "invalid command: A#12", func() { Command("A#12") })
 }
 
 func TestCommands(t *testing.T) {
@@ -65,9 +64,9 @@ func TestScript_Invalid(t *testing.T) {
 	assert.PanicsWithValue(t, "invalid directive: A", func() { Script([]string{"A"}, 0) })
 }
 
-func assertScript(t *testing.T, lineNum int, slot int, value []byte, lines []string) {
+func assertScript(t *testing.T, lineNum int, slotNum int, value []byte, lines []string) {
 	_, s, v := Script(lines, lineNum)
-	assert.Equal(t, slot, s, lines[lineNum])
+	assert.Equal(t, slotNum, s, lines[lineNum])
 	assert.Equal(t, value, v, lines[lineNum])
 }
 
@@ -78,9 +77,9 @@ func TestDirective(t *testing.T) {
 	assertDirective(t, 0, 2, []byte("X"), []string{"002$X"})
 }
 
-func assertDirective(t *testing.T, lineNum int, slot int, value []byte, lines []string) {
+func assertDirective(t *testing.T, lineNum int, slotNum int, value []byte, lines []string) {
 	_, s, v := Directive(lines, lineNum)
-	assert.Equal(t, slot, s, lines[lineNum])
+	assert.Equal(t, slotNum, s, lines[lineNum])
 	assert.Equal(t, value, v, lines[lineNum])
 }
 
@@ -93,9 +92,9 @@ func TestStatement(t *testing.T) {
 	assertStatement(t, 0, 2, []byte("HELLO"), []string{"002=HELLO"})
 }
 
-func assertStatement(t *testing.T, lineNum int, slot int, value []byte, lines []string) {
+func assertStatement(t *testing.T, lineNum int, slotNum int, value []byte, lines []string) {
 	_, s, v := Statement(lines, lineNum)
-	assert.Equal(t, slot, s, lines[lineNum])
+	assert.Equal(t, slotNum, s, lines[lineNum])
 	assert.Equal(t, value, v, lines[lineNum])
 }
 

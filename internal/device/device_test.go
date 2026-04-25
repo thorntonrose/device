@@ -11,8 +11,8 @@ func TestLoad(t *testing.T) {
 	device := New()
 
 	device.Load("003=HELLO\n020$X")
-	assert.Equal(t, []byte("HELLO"), device.Memory.Get(3))
-	assert.Equal(t, []byte("X"), device.Memory.Get(20))
+	assert.Equal(t, []byte("HELLO"), device.Memory.Slots[3])
+	assert.Equal(t, []byte("X"), device.Memory.Slots[20])
 }
 
 func TestRun(t *testing.T) {
@@ -20,5 +20,5 @@ func TestRun(t *testing.T) {
 	device.Load("003=HELLO\n020$X")
 
 	device.Run(20)
-	assert.Equal(t, []byte("HELLO"), device.Memory.Get(mem.BufSlot(mem.Transmit)))
+	assert.Equal(t, []byte("HELLO"), *device.Memory.Buffers[mem.Transmit])
 }
