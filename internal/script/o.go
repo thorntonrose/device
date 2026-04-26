@@ -1,4 +1,4 @@
-package command
+package script
 
 import (
 	"github.com/thorntonrose/device/internal/mem"
@@ -6,13 +6,13 @@ import (
 
 // O[n] -- move source buffer pointer
 //
-// n: number of characters to move (positive or negative, default: 1)
+// n: characters to move (positive or negative, default: 1)
 type O struct {
 	Command
 }
 
 func NewO(memory *mem.Memory) O {
-	return O{New(memory)}
+	return O{NewCommand(memory)}
 }
 
 func (self O) Run(parameters []string) int {

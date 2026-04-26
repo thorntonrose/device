@@ -4,8 +4,16 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/thorntonrose/device/internal/config"
 	"github.com/thorntonrose/device/internal/etc"
 )
+
+func TestMain(m *testing.M) {
+	defer config.InitLogger()()
+	m.Run()
+}
+
+//-----------------------------------------------------------------------------
 
 func TestBufSlotNum(t *testing.T) {
 	assert.Equal(t, 1, BufSlotNum("001"))
@@ -16,13 +24,13 @@ func TestBufSlotNum(t *testing.T) {
 func TestText(t *testing.T) {
 	assert.Equal(t, []byte(""), Text(""))
 	assert.Equal(t, []byte(""), Text("; comment"))
-	assert.Equal(t, []byte("HELLO"), Text("HELLO"))
-	assert.Equal(t, []byte("HELLO"), Text("HELLO; comment"))
+	assert.Equal(t, []byte("FOO"), Text("FOO"))
+	assert.Equal(t, []byte("FOO"), Text("FOO; comment"))
 }
 
 func TestAssignment(t *testing.T) {
 	assertAssignment(t, 2, []byte(""), "002=")
-	assertAssignment(t, 2, []byte("HELLO"), "002=HELLO")
+	assertAssignment(t, 2, []byte("FOO"), "002=FOO")
 }
 
 func assertAssignment(t *testing.T, slotNum int, value []byte, line string) {
@@ -73,7 +81,7 @@ func assertScript(t *testing.T, lineNum int, slotNum int, value []byte, lines []
 //-----------------------------------------------------------------------------
 
 func TestDirective(t *testing.T) {
-	assertDirective(t, 0, 2, []byte("HELLO"), []string{"002=HELLO"})
+	assertDirective(t, 0, 2, []byte("FOO"), []string{"002=FOO"})
 	assertDirective(t, 0, 2, []byte("X"), []string{"002$X"})
 }
 
@@ -89,7 +97,7 @@ func TestStatement(t *testing.T) {
 	assertStatement(t, 0, 0, nil, []string{""})
 	assertStatement(t, 0, 0, nil, []string{"  "})
 	assertStatement(t, 0, 0, nil, []string{"; comment"})
-	assertStatement(t, 0, 2, []byte("HELLO"), []string{"002=HELLO"})
+	assertStatement(t, 0, 2, []byte("FOO"), []string{"002=FOO"})
 }
 
 func assertStatement(t *testing.T, lineNum int, slotNum int, value []byte, lines []string) {
@@ -103,9 +111,9 @@ func assertStatement(t *testing.T, lineNum int, slotNum int, value []byte, lines
 func TestParse(t *testing.T) {
 	program := "\n" +
 		"; comment\n" +
-		"002=HELLO\n" +
+		"002=FOO\n" +
 		"020$X\n"
 
 	data := Parse(program)
-	assert.Equal(t, map[int][]byte{2: []byte("HELLO"), 20: []byte("X")}, data)
+	assert.Equal(t, map[int][]byte{2: []byte("FOO"), 20: []byte("X")}, data)
 }

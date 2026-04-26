@@ -11,9 +11,11 @@ import (
 )
 
 var (
-	Name    = "device"
-	BinDir  = "bin"
-	TempDir = "tmp"
+	Name        = "device"
+	BinDir      = "bin"
+	TempDir     = "tmp"
+	TestTempDir = TempDir + "/test"
+	WorkDir, _  = os.Getwd()
 
 	Pkg   = "./..."
 	Tests = "Test"
@@ -22,6 +24,8 @@ var (
 )
 
 func Clean() {
+	fmt.Println("> Clean")
+
 	for _, path := range []string{BinDir, TempDir, "device.log"} {
 		os.RemoveAll(path)
 	}
@@ -30,12 +34,21 @@ func Clean() {
 }
 
 func Build() {
+	fmt.Println("> Build")
 	bash("go build -o %s/%s ./cmd", BinDir, Name)
 }
 
 func Test() {
+	fmt.Println("> Test")
+	logDir := WorkDir + "/" + TestTempDir
+	Env["LOG_FILE"] = fmt.Sprintf("%s/device.log", logDir)
+
+	sh.Rm(TestTempDir)
+	os.MkdirAll(TestTempDir, 0755)
 	bash("go test -v -run %s %s", getEnv("TESTS", Tests), getEnv("PACKAGE", Pkg))
 }
+
+//-----------------------------------------------------------------------------
 
 func bash(format string, args ...any) {
 	cmd := []string{"-o", "pipefail", "-c", strings.Trim(fmt.Sprintf(format, args...), " ")}

@@ -1,7 +1,6 @@
 package device
 
 import (
-	"github.com/thorntonrose/device/internal/command"
 	"github.com/thorntonrose/device/internal/mem"
 	"github.com/thorntonrose/device/internal/parser"
 	"github.com/thorntonrose/device/internal/script"
@@ -15,18 +14,9 @@ type Device struct {
 
 func New() Device {
 	d := Device{Memory: mem.New()}
-	d.Runners = NewCommands(d.Memory)
-	d.Script = script.New(d.Memory, d.Runners)
+	d.Script = script.NewScript(d.Memory)
 
 	return d
-}
-
-func NewCommands(memory *mem.Memory) map[string]script.Runner {
-	return map[string]script.Runner{
-		"+I": command.NewPlusI(memory),
-		"X":  command.NewX(memory),
-		"Y":  command.NewY(memory),
-	}
 }
 
 //-----------------------------------------------------------------------------

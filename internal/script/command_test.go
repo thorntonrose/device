@@ -1,4 +1,4 @@
-package command
+package script
 
 import (
 	"testing"
@@ -10,7 +10,7 @@ import (
 // Model 2?
 //
 // func TestIntFromSlot(t *testing.T) {
-// 	c := New(mem.New())
+// 	c := NewCommand(mem.New())
 // 	c.Memory.Slots[20] = []byte("123")
 // 	c.Memory.Slots[21] = []byte("A")
 //
@@ -20,23 +20,22 @@ import (
 // }
 
 func TestIntFromValue(t *testing.T) {
-	c := New(mem.New())
+	c := NewCommand(mem.New())
 
 	assert.Equal(t, 123, c.IntFromValue("c", "123"))
 	assert.Panics(t, func() { c.IntFromValue("c", "A") })
 }
 
 func TestVarNum(t *testing.T) {
-	c := New(mem.New())
-	c.Memory.Variables[0] = 123
+	c := NewCommand(mem.New())
 
-	assert.Equal(t, 123, c.VarNum("c", "#0"))
+	assert.Equal(t, 0, c.VarNum("c", "#0"))
 	assert.Panics(t, func() { c.VarNum("c", "#10") })
 	assert.Panics(t, func() { c.VarNum("c", "#A") })
 }
 
 func TestIntFromParameter(t *testing.T) {
-	c := New(mem.New())
+	c := NewCommand(mem.New())
 	c.Memory.Variables[1] = 123
 
 	assert.Equal(t, 123, c.IntFromParameter("c", "123"))
@@ -44,7 +43,7 @@ func TestIntFromParameter(t *testing.T) {
 }
 
 func TestInt(t *testing.T) {
-	c := New(mem.New())
+	c := NewCommand(mem.New())
 	c.Memory.Variables[1] = 65
 
 	assert.Equal(t, 1, c.Int("c", []string{}, 0, 1))
@@ -56,7 +55,7 @@ func TestInt(t *testing.T) {
 //-----------------------------------------------------------------------------
 
 func TestCode(t *testing.T) {
-	c := New(mem.New())
+	c := NewCommand(mem.New())
 
 	assert.Equal(t, 1, c.Code("c", []string{"1"}, 0, 1, []int{1, 2}))
 	assert.Equal(t, 1, c.Code("c", []string{"1"}, 0, 0, []int{1, 2}))
@@ -64,7 +63,7 @@ func TestCode(t *testing.T) {
 }
 
 func TestNonNegative(t *testing.T) {
-	c := New(mem.New())
+	c := NewCommand(mem.New())
 
 	assert.Equal(t, 0, c.NonNegative("c", []string{"0"}, 0, 1))
 	assert.Equal(t, 1, c.NonNegative("c", []string{"1"}, 0, 0))
@@ -72,7 +71,7 @@ func TestNonNegative(t *testing.T) {
 }
 
 func TestPositive(t *testing.T) {
-	c := New(mem.New())
+	c := NewCommand(mem.New())
 
 	assert.Equal(t, 1, c.Positive("c", []string{"1"}, 0, 1))
 	assert.Panics(t, func() { c.Positive("c", []string{"0"}, 0, 1) })
@@ -80,7 +79,7 @@ func TestPositive(t *testing.T) {
 }
 
 func TestRange(t *testing.T) {
-	c := New(mem.New())
+	c := NewCommand(mem.New())
 
 	assert.Equal(t, 5, c.Range("c", []string{"5"}, 0, 1, 1, 10))
 	assert.Panics(t, func() { c.Range("c", []string{"0"}, 0, 1, 1, 10) })
@@ -88,7 +87,7 @@ func TestRange(t *testing.T) {
 }
 
 func TestBytes(t *testing.T) {
-	c := New(mem.New())
+	c := NewCommand(mem.New())
 
 	assert.Equal(t, []byte{28}, c.Bytes("c", []string{}, 0, []byte{28}))
 	assert.Equal(t, []byte{28}, c.Bytes("c", []string{""}, 0, []byte{28}))

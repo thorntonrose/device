@@ -1,4 +1,4 @@
-package command
+package script
 
 import "github.com/thorntonrose/device/internal/mem"
 
@@ -11,7 +11,7 @@ type StarN struct {
 // #v -- variable to set (default: 0)
 // c -- constant value (default: 0)
 func NewStarN(memory *mem.Memory) StarN {
-	return StarN{New(memory)}
+	return StarN{NewCommand(memory)}
 }
 
 func (self StarN) Run(parameters []string) int {

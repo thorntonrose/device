@@ -1,4 +1,4 @@
-package command
+package script
 
 import (
 	"testing"
@@ -25,7 +25,7 @@ func TestB_Set(t *testing.T) {
 
 func TestB_Clear(t *testing.T) {
 	memory := mem.New()
-	memory.Slots[mem.Receive+1] = []byte("HELLO")
+	memory.Slots[mem.Receive+1] = []byte("FOO")
 	memory.Pointers[mem.Receive] = 5
 
 	NewB(memory).Run([]string{"9"})

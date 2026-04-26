@@ -1,4 +1,4 @@
-package command
+package script
 
 import "github.com/thorntonrose/device/internal/mem"
 
@@ -7,5 +7,5 @@ type StarO struct {
 }
 
 func NewStarO(memory *mem.Memory) StarO {
-	return StarO{New(memory)}
+	return StarO{NewCommand(memory)}
 }

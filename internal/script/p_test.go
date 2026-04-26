@@ -1,4 +1,4 @@
-package command
+package script
 
 import (
 	"testing"
@@ -9,11 +9,11 @@ import (
 
 func TestP(t *testing.T) {
 	memory := mem.New()
-	memory.Set(20, []byte("HELLO"))
+	memory.Set(20, []byte("FOO"))
 
 	p := NewP(memory)
 	assert.Equal(t, string(memory.Slots[0]), p.Get([]string{}))
-	assert.Equal(t, "HELLO", p.Get([]string{"20"}))
+	assert.Equal(t, "FOO", p.Get([]string{"20"}))
 
 	p.Run([]string{"20"})
 }

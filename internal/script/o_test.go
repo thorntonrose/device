@@ -1,4 +1,4 @@
-package command
+package script
 
 import (
 	"testing"
@@ -9,7 +9,7 @@ import (
 
 func TestO(t *testing.T) {
 	memory := mem.New()
-	memory.Set(mem.Receive+1, []byte("HELLO"))
+	memory.Set(mem.Receive+1, []byte("FOO"))
 
 	o := NewO(memory)
 

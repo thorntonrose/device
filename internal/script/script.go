@@ -25,13 +25,20 @@ type Runner interface {
 	Run(parameters []string) (skip int)
 }
 
-func New(memory *mem.Memory, runners map[string]Runner) Script {
-	return Script{Memory: memory, Runners: runners}
+func NewScript(memory *mem.Memory) Script {
+	return Script{Memory: memory, Runners: NewCommands(memory)}
 }
 
-func (self Script) Run(slotNum int) int {
-	log.Printf("Script.Run: slot: %d", slotNum)
-	commands := self.Commands(slotNum)
+func NewCommands(memory *mem.Memory) map[string]Runner {
+	return map[string]Runner{"G": NewG(memory), "I": NewI(memory), "+I": NewI(memory), "V": NewV(memory),
+		"X": NewX(memory), "Y": NewY(memory)}
+}
+
+//-----------------------------------------------------------------------------
+
+func (self Script) Run(slot int) int {
+	log.Printf("Script.Run: slot: %d", slot)
+	commands := self.Commands(slot)
 	log.Printf("Script.Run: commands: %v", commands)
 	index := 0
 

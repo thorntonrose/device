@@ -36,7 +36,7 @@ var SingleCommandPattern = regexp.MustCompile(`^` + script.CommandPattern.String
 //
 // Example:
 //
-// 002=HELLO
+// 002=FOO
 // 003=123
 // 020$X
 // 021$X1.-2.#3.'A1!' ; not a real command

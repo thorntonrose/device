@@ -1,4 +1,4 @@
-package command
+package script
 
 import (
 	"testing"
@@ -9,10 +9,10 @@ import (
 
 func TestA(t *testing.T) {
 	memory := mem.New()
-	memory.Set(20, []byte("HELLO"))
+	memory.Set(20, []byte("FOO"))
 
 	assert.Equal(t, 0, NewA(memory).Run([]string{"20", "0"}))
-	assert.Equal(t, []byte("HELLO"), *memory.Buffers[mem.Transmit])
+	assert.Equal(t, []byte("FOO"), *memory.Buffers[mem.Transmit])
 }
 
 func TestA_Skip(t *testing.T) {

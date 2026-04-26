@@ -13,7 +13,6 @@ func GetEnv(key, def string) string {
 
 func InitLogger() func() {
 	file := GetEnv("LOG_FILE", "device.log")
-	os.Remove(file)
 	writer := etc.Must(os.OpenFile(file, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644))
 	log.SetOutput(writer)
 

@@ -1,4 +1,4 @@
-package command
+package script
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ type Y struct {
 }
 
 func NewY(memory *mem.Memory) *Y {
-	return &Y{New(memory), 0}
+	return &Y{NewCommand(memory), 0}
 }
 
 func (c *Y) Run(parameters []string) (skip int) {

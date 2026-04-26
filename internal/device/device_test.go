@@ -10,15 +10,15 @@ import (
 func TestLoad(t *testing.T) {
 	device := New()
 
-	device.Load("003=HELLO\n020$X")
-	assert.Equal(t, []byte("HELLO"), device.Memory.Slots[3])
+	device.Load("003=FOO\n020$X")
+	assert.Equal(t, []byte("FOO"), device.Memory.Slots[3])
 	assert.Equal(t, []byte("X"), device.Memory.Slots[20])
 }
 
 func TestRun(t *testing.T) {
 	device := New()
-	device.Load("003=HELLO\n020$X")
+	device.Load("003=FOO\n020$X")
 
 	device.Run(20)
-	assert.Equal(t, []byte("HELLO"), *device.Memory.Buffers[mem.Transmit])
+	assert.Equal(t, []byte("FOO"), *device.Memory.Buffers[mem.Transmit])
 }

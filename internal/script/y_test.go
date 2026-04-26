@@ -1,4 +1,4 @@
-package command
+package script
 
 import (
 	"testing"
@@ -10,6 +10,8 @@ import (
 
 func TestY(t *testing.T) {
 	c := NewY(mem.New())
+	c.Memory.Slots[0] = []byte("FOO")
+	c.Memory.Slots[1] = []byte("BAR")
 
 	etc.Times(2, func(i int) {
 		c.Memory.Clear(c.Memory.Destination)
@@ -19,4 +21,5 @@ func TestY(t *testing.T) {
 
 	c.SlotNum = len(c.Memory.Slots) - 1
 	assert.Equal(t, 1, c.Run([]string{"1"}))
+	assert.Equal(t, 0, c.SlotNum)
 }

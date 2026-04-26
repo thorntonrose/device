@@ -1,4 +1,4 @@
-package command
+package script
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 
 func TestPlusI_RunAction(t *testing.T) {
 	c := NewPlusI(mem.New())
-	*c.Memory.Buffers[mem.Transmit] = []byte("HELLO")
+	*c.Memory.Buffers[mem.Transmit] = []byte("FOO")
 
 	c.Run([]string{})
 	// c.RunAction(5, 0, 0, 0)

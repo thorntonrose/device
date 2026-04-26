@@ -1,4 +1,4 @@
-package command
+package script
 
 import (
 	"testing"
@@ -9,15 +9,15 @@ import (
 
 func TestX(t *testing.T) {
 	memory := mem.New()
-	memory.Set(mem.Receive+1, []byte("HELLO"))
+	memory.Set(mem.Receive+1, []byte("FOO"))
 
 	NewX(memory).Run([]string{})
-	assert.Equal(t, []byte("HELLO"), *memory.Buffers[mem.Transmit])
+	assert.Equal(t, []byte("FOO"), *memory.Buffers[mem.Transmit])
 }
 
 func TestX_InvalidParameters(t *testing.T) {
 	memory := mem.New()
-	memory.Set(mem.Receive+1, []byte("HELLO"))
+	memory.Set(mem.Receive+1, []byte("FOO"))
 	x := NewX(memory)
 
 	assert.Panics(t, func() { x.Run([]string{"A"}) })
