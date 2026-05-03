@@ -32,14 +32,18 @@ func NewScript(memory *mem.Memory) Script {
 
 func NewRunners(memory *mem.Memory) map[string]Runner {
 	return map[string]Runner{
-		"B":  NewB(memory),
-		"G":  NewG(memory),
-		"I":  NewI(memory),
-		"+I": NewPlusI(memory),
-		"P":  NewP(memory),
-		"V":  NewV(memory),
-		"X":  NewX(memory),
-		"Y":  NewY(memory),
+		"+A": NewPlusA(memory), // compare variable
+		"B":  NewB(memory),     // set buffers
+		"G":  NewG(memory),     // clear dest
+		"I":  NewI(memory),     // compare
+		"+I": NewPlusI(memory), // send/receive
+		"*N": NewStarN(memory), // set variable
+		"O":  NewO(memory),     // move src pointer
+		"*O": NewStarO(memory), // variable math
+		"P":  NewP(memory),     // display slot
+		"V":  NewV(memory),     // display buffer
+		"X":  NewX(memory),     // copy src to dest
+		"Y":  NewY(memory),     // dump memory
 	}
 }
 

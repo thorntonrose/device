@@ -33,14 +33,10 @@ func (self I) Run(parameters []string) (skip int) {
 	return etc.If(self.Compare(self.Data(c), a, c), s, 0)
 }
 
-func (self I) Compare(data string, a int, c string) bool {
-	result := (a == 0) ||
-		(a == 1 && data == c) ||
-		(a == 2 && data != c) ||
-		(a == 3 && data < c) ||
-		(a == 4 && data > c)
-
+func (self I) Compare(s string, a int, c string) bool {
+	result := (a == 0) || (a == 1 && s == c) || (a == 2 && s != c) || (a == 3 && s < c) || (a == 4 && s > c)
 	log.Printf("I.Compare: %t\n", result)
+
 	return result
 }
 

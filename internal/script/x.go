@@ -7,7 +7,7 @@ import (
 )
 
 // X[n.c] -- copy source buffer to destination buffer (moving read pointer)
-
+//
 // n: characters to copy (default: 0 [all])
 // c: stop character (default: 0 [end of buffer])
 type X struct {

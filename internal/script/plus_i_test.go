@@ -15,14 +15,18 @@ func TestPlusI_Transmit(t *testing.T) {
 	pi := NewPlusI(mem.New())
 	*pi.Memory.Buffers[mem.Transmit] = []byte("FOO")
 
+	AssertTransmit(t, pi, "", "FOO")
+	AssertTransmit(t, pi, "1", "FOO\n")
+	assert.Panics(t, func() { pi.Run([]string{"6"}) })
+}
+
+func AssertTransmit(t *testing.T, pi PlusI, a string, expected string) {
 	reader, writer, restore := StdoutPipe()
 	defer restore()
 
-	pi.Run([]string{})
+	pi.Run([]string{a})
 	writer.Close()
-	assert.Equal(t, "FOO", string(etc.Must(io.ReadAll(reader))))
-
-	assert.Panics(t, func() { pi.Run([]string{"6"}) })
+	assert.Equal(t, expected, string(etc.Must(io.ReadAll(reader))))
 }
 
 func StdoutPipe() (*os.File, *os.File, func()) {
