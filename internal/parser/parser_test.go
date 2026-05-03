@@ -56,9 +56,9 @@ func TestCommand(t *testing.T) {
 
 func TestCommand_Invalid(t *testing.T) {
 	p := NewTestParser()
-	assert.PanicsWithValue(t, "invalid command: _", func() { p.Command("_") })
-	assert.PanicsWithValue(t, "invalid command: A!", func() { p.Command("A!") })
-	assert.PanicsWithValue(t, "invalid command: A#12", func() { p.Command("A#12") })
+	assert.PanicsWithError(t, "invalid command: _", func() { p.Command("_") })
+	assert.PanicsWithError(t, "invalid command: A!", func() { p.Command("A!") })
+	assert.PanicsWithError(t, "invalid command: A#12", func() { p.Command("A#12") })
 }
 
 func TestCommands(t *testing.T) {

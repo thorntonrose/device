@@ -139,7 +139,7 @@ func (self Parser) Commands(lines []string, index int, slotNum int, value []byte
 }
 
 func (self Parser) CommandsRecover(e error, index int, slotNum int, value []byte) (int, int, []byte) {
-	etc.Assert(strings.Contains(e.Error(), "invalid command"), e.Error())
+	etc.Assert(strings.Contains(e.Error(), "invalid command"), fmt.Errorf("invalid command: %v", e))
 	return index, slotNum, value
 }
 
@@ -147,8 +147,8 @@ func (self Parser) Command(line string) []byte {
 	line = strings.TrimSpace(line)
 
 	if line != "" {
-		etc.Assert(SingleCommandPattern.MatchString(line), fmt.Sprintf("invalid command: %s", line))
-		etc.Assert(self.Script.IsCommand(line), fmt.Sprintf("unknown command: %s", line))
+		etc.Assert(SingleCommandPattern.MatchString(line), fmt.Errorf("invalid command: %s", line))
+		etc.Assert(self.Script.IsCommand(line), fmt.Errorf("unknown command: %s", line))
 	}
 
 	return []byte(line)

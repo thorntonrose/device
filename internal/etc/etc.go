@@ -31,16 +31,14 @@ func Times(n int, fn func(int)) {
 
 //-----------------------------------------------------------------------------
 
-func Assert(condition bool, message string) {
+func Assert(condition bool, err error) {
 	if !condition {
-		panic(message)
+		panic(err)
 	}
 }
 
 func Check(err error) {
-	if err != nil {
-		panic(err)
-	}
+	Assert(err == nil, err)
 }
 
 func Must[T any](val T, err error) T {

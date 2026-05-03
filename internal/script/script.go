@@ -72,7 +72,7 @@ func (self Script) RunCommands(index int, commands [][]string) int {
 func (self Script) RunCommand(tokens []string) int {
 	log.Printf("Script.RunCommand: tokens: %v\n", tokens)
 	runner := self.Runners[tokens[1]]
-	etc.Assert(runner != nil, fmt.Sprintf("unknown command: %s", tokens[1]))
+	etc.Assert(runner != nil, fmt.Errorf("unknown command: %s", tokens[1]))
 
 	return runner.Run(strings.Split(tokens[2], "."))
 }
