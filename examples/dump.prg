@@ -3,12 +3,12 @@
 
 ; dump all
 020$
-   G    ; clear destination buffer
-   Y2   ; append next non-empty location to destination buffer; skip 2 if none
-   V    ; display destination buffer
-   I-3  ; go back to G
+   G    ; clear dest
+   Y2   ; append next non-empty slot to dest; skip 2 if none
+   V    ; display dest
+   I-3  ; repeat
 
 ; dump buffers
 021$
-   P2   ; display transmit buffer
-   P3   ; display receive buffer
+   P2   ; display transmit
+   P3   ; display receive

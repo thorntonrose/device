@@ -11,14 +11,14 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	defer config.InitLogger()()
+	defer config.InitLog()()
 	m.Run()
 }
 
 //-----------------------------------------------------------------------------
 
 func TestNext(t *testing.T) {
-	script := NewScript(mem.New())
+	script := New(mem.New())
 	assert.Equal(t, 1, script.Next(0, 0))
 	assert.Equal(t, 2, script.Next(0, 1))
 	assert.Equal(t, -1, script.Next(0, -1))
@@ -28,7 +28,7 @@ func TestCommands(t *testing.T) {
 	memory := mem.New()
 	memory.Set(20, []byte("A*B1+C1.-2.#3.'A1!'D.1E..2"))
 
-	commands := NewScript(memory).Commands(string(memory.Slots[20]))
+	commands := New(memory).Commands(string(memory.Slots[20]))
 	assert.Equal(t, [][]string{{"A", "A", ""}, {"*B1", "*B", "1"}, {"+C1.-2.#3.'A1!'", "+C", "1.-2.#3.'A1!'"},
 		{"D.1", "D", ".1"}, {"E..2", "E", "..2"}}, commands)
 }

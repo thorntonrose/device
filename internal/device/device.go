@@ -11,11 +11,11 @@ type Device struct {
 	Script script.Script
 }
 
-func New() Device {
-	d := Device{Memory: mem.New()}
-	d.Script = script.NewScript(d.Memory)
+func New() (d Device) {
+	d.Memory = mem.New()
+	d.Script = script.New(d.Memory)
 
-	return d
+	return
 }
 
 //-----------------------------------------------------------------------------

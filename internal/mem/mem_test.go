@@ -5,7 +5,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/thorntonrose/device/internal/config"
 )
+
+func TestMain(m *testing.M) {
+	defer config.InitLog()()
+	m.Run()
+}
+
+//-----------------------------------------------------------------------------
 
 func TestNew(t *testing.T) {
 	memory := New()

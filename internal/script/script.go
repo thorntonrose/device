@@ -6,6 +6,10 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/thorntonrose/device/internal/command/bufs"
+	"github.com/thorntonrose/device/internal/command/flow"
+	"github.com/thorntonrose/device/internal/command/io"
+	"github.com/thorntonrose/device/internal/command/vars"
 	"github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
 )
@@ -26,24 +30,25 @@ type Runner interface {
 	Run(parameters []string) (skip int)
 }
 
-func NewScript(memory *mem.Memory) Script {
+func New(memory *mem.Memory) Script {
 	return Script{Memory: memory, Runners: NewRunners(memory)}
 }
 
 func NewRunners(memory *mem.Memory) map[string]Runner {
 	return map[string]Runner{
-		"+A": NewPlusA(memory), // compare variable
-		"B":  NewB(memory),     // set buffers
-		"G":  NewG(memory),     // clear dest
-		"I":  NewI(memory),     // compare
-		"+I": NewPlusI(memory), // send/receive
-		"*N": NewStarN(memory), // set variable
-		"O":  NewO(memory),     // move src pointer
-		"*O": NewStarO(memory), // variable math
-		"P":  NewP(memory),     // display slot
-		"V":  NewV(memory),     // display buffer
-		"X":  NewX(memory),     // copy src to dest
-		"Y":  NewY(memory),     // dump memory
+		"+A": vars.NewPlusA(memory), // compare variable
+		"B":  bufs.NewB(memory),     // set buffers
+		"G":  bufs.NewG(memory),     // clear dest
+		"I":  flow.NewI(memory),     // compare
+		"+I": io.NewPlusI(memory),   // send/receive
+		"*N": vars.NewStarN(memory), // set variable
+		"O":  bufs.NewO(memory),     // move src pointer
+		"*O": vars.NewStarO(memory), // do variable math
+		"P":  io.NewP(memory),       // display slot
+		"+Q": vars.NewPlusQ(memory), // copy var to dest
+		"V":  io.NewV(memory),       // display buffer
+		"X":  bufs.NewX(memory),     // copy src to dest
+		"Y":  bufs.NewY(memory),     // append non-empty memory
 	}
 }
 

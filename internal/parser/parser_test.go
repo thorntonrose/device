@@ -12,7 +12,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	defer config.InitLogger()()
+	defer config.InitLog()()
 	m.Run()
 }
 

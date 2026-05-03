@@ -10,33 +10,46 @@ import (
 	"github.com/thorntonrose/device/internal/etc"
 )
 
-func Run() {
-	os.Remove(config.LogFile)
-	defer config.InitLogger()()
+type Flags struct {
+	Dump *bool
+	Log  *string
+	Slot *int
+}
 
-	dump := flag.Bool("dump", false, "dump memory after running")
-	slot := flag.Int("slot", 0, "")
+func Run() {
+	flags := ParseFlags()
+	config.LogFile = *flags.Log
+	defer config.InitNewLog()()
+
+	RunProgram(flags)
+}
+
+func ParseFlags() (flags Flags) {
+	flags.Dump = flag.Bool("dump", false, "dump memory")
+	flags.Log = flag.String("log", "none", "log file")
+	flags.Slot = flag.Int("slot", 0, "")
 	flag.Usage = Usage
 	flag.Parse()
 
-	RunProgram(*slot, *dump)
+	return
 }
 
 func Usage() {
 	fmt.Printf("Usage: %s [flags] <file>\n", filepath.Base(os.Args[0]))
 	fmt.Println("Flags:")
-	fmt.Println("  -dump = dump memory after running")
+	fmt.Println("  -dump = dump memory at end of program")
+	fmt.Println("  -log = log file")
 	fmt.Println("  -slot = script slot number (default: 0)")
 
 	os.Exit(1)
 }
 
-func RunProgram(slot int, dump bool) {
+func RunProgram(flags Flags) {
 	device := New()
 	device.Load(string(etc.Must(os.ReadFile(GetFile()))))
-	device.Run(slot)
+	device.Run(*flags.Slot)
 
-	if dump {
+	if *flags.Dump {
 		fmt.Println("\n-----\n" + device.Memory.Dump())
 	}
 }

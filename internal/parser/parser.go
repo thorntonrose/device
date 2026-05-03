@@ -50,7 +50,7 @@ func New(script script.Script) Parser {
 // 020$X              ; src -> dest
 // 021$Y1.-2.#3.'A1!' ; not a real command
 func (self Parser) Parse(program string) map[int][]byte {
-	log.Println("Parse")
+	log.Println("parser.Parse")
 	data := map[int][]byte{}
 	lines := strings.Split(program, "\n")
 	index := 0

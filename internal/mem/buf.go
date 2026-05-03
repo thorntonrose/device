@@ -15,7 +15,7 @@ func (m *Memory) ReadAll(bufNum int, maxCount int, stop byte) (data []byte) {
 		data = append(data, b)
 	}
 
-	return data
+	return
 }
 
 func (m *Memory) HasNext(bufNum int, count int, maxCount int) bool {

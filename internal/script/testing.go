@@ -3,23 +3,26 @@ package script
 import (
 	"strconv"
 
+	"github.com/thorntonrose/device/internal/command"
 	"github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
 )
 
 func NewTestScript(memory *mem.Memory) Script {
-	script := NewScript(memory)
+	script := New(memory)
 	script.Runners = map[string]Runner{"Z": NewZ(memory), "+Z": NewZ(memory), "*Z": NewZ(memory)}
 
 	return script
 }
 
+//-----------------------------------------------------------------------------
+
 type Z struct {
-	Command
+	command.Command
 }
 
 func NewZ(memory *mem.Memory) Z {
-	return Z{NewCommand(memory)}
+	return Z{command.New(memory)}
 }
 
 func (self Z) Run(parameters []string) int {

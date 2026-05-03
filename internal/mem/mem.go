@@ -39,11 +39,11 @@ type Memory struct {
 }
 
 func New() *Memory {
-	memory := Memory{Slots: NewSlots(), Pointers: make([]int, MaxBuffers+1), Variables: make([]int, MaxVariables),
+	m := &Memory{Slots: NewSlots(), Pointers: make([]int, MaxBuffers+1), Variables: make([]int, MaxVariables),
 		Source: Receive, Destination: Transmit}
-	memory.Buffers = NewBuffers(&memory)
+	m.Buffers = NewBuffers(m)
 
-	return &memory
+	return m
 }
 
 func NewSlots() [][]byte {
@@ -106,7 +106,7 @@ func (m *Memory) Dump(slotNums ...int) string {
 
 func (m *Memory) SlotLines(slotNums ...int) (lines []string) {
 	etc.EachWithIndex(m.Slots, func(data []byte, i int) { lines = append(lines, m.SlotLine(data, i, slotNums...)...) })
-	return lines
+	return
 }
 
 func (m *Memory) SlotLine(data []byte, slotNum int, slotNums ...int) []string {
