@@ -41,11 +41,12 @@ func Build() {
 func Test() {
 	fmt.Println("> Test")
 	logDir := WorkDir + "/" + TestTempDir
-	Env["LOG_FILE"] = fmt.Sprintf("%s/device.log", logDir)
+	Env["LOG_FILE"] = logDir + "/test.log"
+	Env["TEST_TEMP_DIR"] = WorkDir + "/" + TestTempDir
 
 	sh.Rm(TestTempDir)
 	os.MkdirAll(TestTempDir, 0755)
-	bash("go test -v -run %s %s", getEnv("TESTS", Tests), getEnv("PACKAGE", Pkg))
+	bash("go test -v -tags test -run %s %s", getEnv("TESTS", Tests), getEnv("PACKAGE", Pkg))
 }
 
 //-----------------------------------------------------------------------------

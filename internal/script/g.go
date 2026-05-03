@@ -1,6 +1,8 @@
 package script
 
 import (
+	"log"
+
 	"github.com/thorntonrose/device/internal/mem"
 )
 
@@ -14,6 +16,8 @@ func NewG(memory *mem.Memory) G {
 }
 
 func (self G) Run(_ []string) int {
+	log.Printf("G.Run: clear: %d\n", self.Memory.Destination)
 	self.Memory.Clear(self.Memory.Destination)
+
 	return 0
 }

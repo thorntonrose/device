@@ -1,6 +1,8 @@
 package mem
 
-import "github.com/thorntonrose/device/internal/etc"
+import (
+	"github.com/thorntonrose/device/internal/etc"
+)
 
 func (m *Memory) ReadAll(bufNum int, maxCount int, stop byte) (data []byte) {
 	for count := 0; m.HasNext(bufNum, count, maxCount); count++ {

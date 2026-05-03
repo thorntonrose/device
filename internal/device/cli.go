@@ -11,6 +11,7 @@ import (
 )
 
 func Run() {
+	os.Remove(config.LogFile)
 	defer config.InitLogger()()
 
 	slot := flag.Int("slot", 0, "")

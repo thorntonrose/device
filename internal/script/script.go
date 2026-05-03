@@ -1,6 +1,7 @@
 package script
 
 import (
+	"fmt"
 	"log"
 	"regexp"
 	"strings"
@@ -26,21 +27,31 @@ type Runner interface {
 }
 
 func NewScript(memory *mem.Memory) Script {
-	return Script{Memory: memory, Runners: NewCommands(memory)}
+	return Script{Memory: memory, Runners: NewRunners(memory)}
 }
 
-func NewCommands(memory *mem.Memory) map[string]Runner {
-	return map[string]Runner{"G": NewG(memory), "I": NewI(memory), "+I": NewI(memory), "V": NewV(memory),
-		"X": NewX(memory), "Y": NewY(memory)}
+func NewRunners(memory *mem.Memory) map[string]Runner {
+	return map[string]Runner{
+		"B":  NewB(memory),
+		"G":  NewG(memory),
+		"I":  NewI(memory),
+		"+I": NewPlusI(memory),
+		"P":  NewP(memory),
+		"V":  NewV(memory),
+		"X":  NewX(memory),
+		"Y":  NewY(memory),
+	}
 }
 
 //-----------------------------------------------------------------------------
 
-func (self Script) Run(slot int) int {
-	log.Printf("Script.Run: slot: %d", slot)
-	commands := self.Commands(slot)
-	log.Printf("Script.Run: commands: %v", commands)
-	index := 0
+func (self Script) Run(slotNum int) int {
+	log.Printf("Script.Run: slot: %d\n", slotNum)
+	return self.RunCommands(0, self.Commands(string(self.Memory.Slots[slotNum])))
+}
+
+func (self Script) RunCommands(index int, commands [][]string) int {
+	log.Printf("Script.RunCommands: %v\n", commands)
 
 	for index >= 0 && index < len(commands) {
 		index = self.Next(index, self.RunCommand(commands[index]))
@@ -49,16 +60,26 @@ func (self Script) Run(slot int) int {
 	return index
 }
 
-func (self Script) Commands(slotNum int) [][]string {
-	// expect: [<match>, <modifier><letter>, <parameters>]
-	return CommandPattern.FindAllStringSubmatch(string(self.Memory.Slots[slotNum]), -1)
+func (self Script) RunCommand(tokens []string) int {
+	log.Printf("Script.RunCommand: tokens: %v\n", tokens)
+	runner := self.Runners[tokens[1]]
+	etc.Assert(runner != nil, fmt.Sprintf("unknown command: %s", tokens[1]))
+
+	return runner.Run(strings.Split(tokens[2], "."))
+}
+
+func (self Script) Commands(value string) [][]string {
+	// expect: [[<match>, <modifier><letter>, <parameters>], ...]
+	return CommandPattern.FindAllStringSubmatch(value, -1)
 }
 
 func (self Script) Next(index int, skip int) int {
 	return etc.If(skip == 0, index+1, etc.If(skip > 0, index+1+skip, index+skip))
 }
 
-func (self Script) RunCommand(tokens []string) int {
-	log.Printf("Script.RunCommand: tokens: %v", tokens)
-	return self.Runners[tokens[1]].Run(strings.Split(tokens[2], "."))
+//-----------------------------------------------------------------------------
+
+func (self Script) IsCommand(value string) bool {
+	name := etc.Value(self.Commands(value), [][]string{{"", ""}})[0][1]
+	return self.Runners[name] != nil
 }

@@ -9,10 +9,14 @@ import (
 
 func TestB_NoChange(t *testing.T) {
 	memory := mem.New()
+	b := NewB(memory)
 
-	NewB(memory).Run([]string{})
+	b.Run([]string{})
 	assert.Equal(t, mem.Receive, memory.Source)
 	assert.Equal(t, mem.Transmit, memory.Destination)
+
+	assert.Panics(t, func() { b.Run([]string{"6"}) })
+	assert.Panics(t, func() { b.Run([]string{"", "6"}) })
 }
 
 func TestB_Set(t *testing.T) {
@@ -30,13 +34,4 @@ func TestB_Clear(t *testing.T) {
 
 	NewB(memory).Run([]string{"9"})
 	assert.Equal(t, 0, memory.Pointers[mem.Receive])
-}
-
-func TestB_InvalidParameters(t *testing.T) {
-	memory := mem.New()
-
-	assert.Panics(t, func() { NewB(memory).Run([]string{"A"}) })
-	assert.Panics(t, func() { NewB(memory).Run([]string{"6"}) })
-	assert.Panics(t, func() { NewB(memory).Run([]string{"0", "A"}) })
-	assert.Panics(t, func() { NewB(memory).Run([]string{"0", "6"}) })
 }

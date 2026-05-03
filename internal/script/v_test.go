@@ -1,9 +1,12 @@
 package script
 
 import (
+	"fmt"
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
 )
 
@@ -12,16 +15,17 @@ func TestV(t *testing.T) {
 	*v.Memory.Buffers[mem.Transmit] = []byte("FOO")
 	*v.Memory.Buffers[mem.Receive] = []byte("BAR")
 
-	assert.Equal(t, "FOO", v.Get([]string{}))
-	assert.Equal(t, "BAR", v.Get([]string{"2"}))
+	AssertV(t, v, []string{""}, "FOO")  // defaults
+	AssertV(t, v, []string{"2"}, "BAR") // receive buffer
 
-	v.Run([]string{"2"})
+	assert.Panics(t, func() { v.Run([]string{fmt.Sprintf("%d", mem.MaxBuffers+1)}) })
 }
 
-func TestV_InvalidParameters(t *testing.T) {
-	memory := mem.New()
-	v := NewV(memory)
+func AssertV(t *testing.T, v V, parameters []string, expected string) {
+	reader, writer, restore := StderrPipe()
+	defer restore()
 
-	assert.Panics(t, func() { v.Run([]string{"A"}) })
-	assert.Panics(t, func() { v.Run([]string{"6"}) })
+	v.Run(parameters)
+	writer.Close()
+	assert.Equal(t, expected+"\n", string(etc.Must(io.ReadAll(reader))))
 }

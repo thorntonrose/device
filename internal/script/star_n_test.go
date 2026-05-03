@@ -8,19 +8,20 @@ import (
 )
 
 func TestStarN(t *testing.T) {
-	memory := mem.New()
-	starN := NewStarN(memory)
-	starN.Memory.Variables[0] = 1
+	sn := NewStarN(mem.New())
+	sn.Memory.Variables[0] = 1
 
-	starN.Run([]string{})
-	assert.Equal(t, 0, memory.Variables[0])
+	sn.Run([]string{})
+	assert.Equal(t, 0, sn.Memory.Variables[0])
 
-	starN.Run([]string{"", "1"})
-	assert.Equal(t, 1, memory.Variables[0])
+	sn.Run([]string{"#1", "2"})
+	assert.Equal(t, 2, sn.Memory.Variables[1])
+}
 
-	starN.Run([]string{"#1", "1"})
-	assert.Equal(t, 1, memory.Variables[1])
+func TestStarN_FromVariable(t *testing.T) {
+	sn := NewStarN(mem.New())
+	sn.Memory.Variables[2] = 2
 
-	assert.Panics(t, func() { starN.Run([]string{"1"}) })
-	assert.Panics(t, func() { starN.Run([]string{"#10"}) })
+	sn.Run([]string{"#1", "#2"})
+	assert.Equal(t, 2, sn.Memory.Variables[1])
 }

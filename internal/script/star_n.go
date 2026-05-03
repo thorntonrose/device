@@ -15,9 +15,9 @@ func NewStarN(memory *mem.Memory) StarN {
 }
 
 func (self StarN) Run(parameters []string) int {
-	v := self.Variable("c ()", parameters, 0, 0)
-	c := self.Int("", parameters, 1, 0)
-
+	v := self.Variable("v (variable)", parameters, 0, 0)
+	c := self.Int("c (constant)", parameters, 1, 0)
 	self.Memory.Variables[v] = c
+
 	return 0
 }

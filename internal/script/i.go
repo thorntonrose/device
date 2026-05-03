@@ -1,6 +1,8 @@
 package script
 
 import (
+	"log"
+
 	"github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
 )
@@ -23,25 +25,32 @@ func NewI(memory *mem.Memory) I {
 }
 
 func (self I) Run(parameters []string) (skip int) {
+	log.Printf("I.Run: %v\n", parameters)
 	s := self.Int("s (skip)", parameters, 0, 0)
 	a := self.Range("a (comparison code)", parameters, 1, 0, 0, 4)
 	c := string(self.Bytes("c (constant)", parameters, 2, []byte{28}))
 
-	return etc.If(self.True(self.Data(c), a, c), s, 0)
+	return etc.If(self.Compare(self.Data(c), a, c), s, 0)
 }
 
-func (self I) True(data string, a int, c string) bool {
-	return (a == 0) ||
+func (self I) Compare(data string, a int, c string) bool {
+	result := (a == 0) ||
 		(a == 1 && data == c) ||
 		(a == 2 && data != c) ||
 		(a == 3 && data < c) ||
 		(a == 4 && data > c)
+
+	log.Printf("I.Compare: %t\n", result)
+	return result
 }
 
 func (self I) Data(c string) string {
 	buf := string(*self.Memory.Buffers[self.Memory.Source])
 	ptr := self.Memory.Pointers[self.Memory.Source]
 
-	return etc.If(ptr+len(c) <= len(buf), func() string { return buf[ptr : ptr+len(c)] },
+	data := etc.If(ptr+len(c) <= len(buf), func() string { return buf[ptr : ptr+len(c)] },
 		func() string { return "" })()
+
+	log.Printf("I.Data: %s\n", data)
+	return data
 }

@@ -7,9 +7,8 @@ import (
 )
 
 type Device struct {
-	Memory  *mem.Memory
-	Runners map[string]script.Runner
-	Script  script.Script
+	Memory *mem.Memory
+	Script script.Script
 }
 
 func New() Device {
@@ -22,7 +21,7 @@ func New() Device {
 //-----------------------------------------------------------------------------
 
 func (self Device) Load(program string) {
-	self.Memory.Load(parser.Parse(program))
+	self.Memory.Load(parser.New(self.Script).Parse(program))
 }
 
 func (self Device) Run(slotNum int) {

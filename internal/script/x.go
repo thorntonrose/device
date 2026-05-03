@@ -1,6 +1,10 @@
 package script
 
-import "github.com/thorntonrose/device/internal/mem"
+import (
+	"log"
+
+	"github.com/thorntonrose/device/internal/mem"
+)
 
 // X[n.c] -- copy source buffer to destination buffer (moving read pointer)
 
@@ -17,7 +21,14 @@ func NewX(memory *mem.Memory) X {
 func (self X) Run(parameters []string) int {
 	n := self.NonNegative("n (characters)", parameters, 0, 0)
 	c := self.Range("c (stop character)", parameters, 1, 0, 0, 255)
-	self.Memory.WriteAll(self.Memory.Destination, self.Memory.ReadAll(self.Memory.Source, n, byte(c)))
+
+	return self.Copy(n, byte(c))
+}
+
+func (self X) Copy(n int, c byte) int {
+	data := self.Memory.ReadAll(self.Memory.Source, n, byte(c))
+	log.Printf("X.Copy: dest: %d, data: %v\n", self.Memory.Destination, data)
+	self.Memory.WriteAll(self.Memory.Destination, data)
 
 	return 0
 }

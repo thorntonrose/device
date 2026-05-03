@@ -1,26 +1,40 @@
 package script
 
 import (
+	"fmt"
+	"io"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
 )
 
 func TestP(t *testing.T) {
-	memory := mem.New()
-	memory.Set(20, []byte("FOO"))
+	p := NewP(mem.New())
+	p.Memory.Set(0, []byte("FOO"))
+	p.Memory.Set(20, []byte("BAR"))
 
-	p := NewP(memory)
-	assert.Equal(t, string(memory.Slots[0]), p.Get([]string{}))
-	assert.Equal(t, "FOO", p.Get([]string{"20"}))
+	AssertP(t, p, []string{}, "000:FOO")
+	AssertP(t, p, []string{"20"}, "020:BAR")
 
-	p.Run([]string{"20"})
+	assert.Panics(t, func() { p.Run([]string{fmt.Sprintf("%d", mem.MaxSlots)}) })
 }
 
-func TestP_InvalidParameters(t *testing.T) {
-	memory := mem.New()
-	p := NewP(memory)
+func AssertP(t *testing.T, p P, parameters []string, expected string) {
+	reader, writer, restore := StderrPipe()
+	defer restore()
 
-	assert.Panics(t, func() { p.Run([]string{"A"}) })
+	p.Run(parameters)
+	writer.Close()
+	assert.Equal(t, expected+"\n", string(etc.Must(io.ReadAll(reader))))
+}
+
+func StderrPipe() (*os.File, *os.File, func()) {
+	origStderr := os.Stderr
+	reader, writer, _ := os.Pipe()
+	os.Stderr = writer
+
+	return reader, writer, func() { os.Stderr = origStderr; writer.Close() }
 }

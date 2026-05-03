@@ -2,6 +2,7 @@ package script
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/thorntonrose/device/internal/mem"
@@ -19,11 +20,9 @@ func NewP(memory *mem.Memory) P {
 }
 
 func (self P) Run(parameters []string) int {
-	fmt.Fprintln(os.Stderr, self.Get(parameters))
-	return 0
-}
-
-func (self P) Get(parameters []string) string {
+	log.Printf("P.Run: %v\n", parameters)
 	m := self.Range("m (memory slot)", parameters, 0, 0, 0, mem.MaxSlots-1)
-	return string(self.Memory.Slots[m])
+	fmt.Fprintf(os.Stderr, "%03d:%s\n", m, string(self.Memory.Slots[m]))
+
+	return 0
 }

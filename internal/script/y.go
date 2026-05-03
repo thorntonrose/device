@@ -2,6 +2,7 @@ package script
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
@@ -19,28 +20,38 @@ func NewY(memory *mem.Memory) *Y {
 	return &Y{NewCommand(memory), 0}
 }
 
-func (c *Y) Run(parameters []string) (skip int) {
-	s := c.Int("s (skip)", parameters, 0, 0)
-	c.Append(c.SlotNum)
-	c.Next()
+func (self *Y) Run(parameters []string) (skip int) {
+	log.Printf("Y.Run: %v\n", parameters)
+	s := self.Int("s (skip)", parameters, 0, 0)
 
-	return etc.If(c.SlotNum == 0, s, 0)
+	return self.AppendNextNonEmpty(s)
 }
 
-func (c *Y) Append(slotNum int) {
-	if data := c.Memory.Slots[slotNum]; len(data) > 0 {
-		c.Memory.WriteAll(c.Memory.Destination, c.Format(slotNum, data))
+func (self *Y) AppendNextNonEmpty(s int) int {
+	slotNum, data := self.Next()
+	self.Append(slotNum, data)
+	self.SlotNum = slotNum + 1
+
+	return etc.If(self.SlotNum == 0, s, 0)
+}
+
+func (self *Y) Next() (int, []byte) {
+	for i := self.SlotNum; i < len(self.Memory.Slots); i++ {
+		if data := self.Memory.Slots[i]; len(data) > 0 {
+			return i, data
+		}
+	}
+
+	return -1, nil
+}
+
+func (self *Y) Append(slotNum int, data []byte) {
+	if len(data) > 0 {
+		log.Printf("Y.Append: slotNum: %d, data: %s\n", slotNum, string(data))
+		self.Memory.WriteAll(self.Memory.Destination, self.Format(slotNum, data))
 	}
 }
 
-func (c *Y) Format(slotNum int, data []byte) []byte {
+func (self *Y) Format(slotNum int, data []byte) []byte {
 	return []byte(fmt.Sprintf("%03d:%s", slotNum, string(data)))
-}
-
-func (c *Y) Next() {
-	c.SlotNum++
-
-	if c.SlotNum == len(c.Memory.Slots) {
-		c.SlotNum = 0
-	}
 }

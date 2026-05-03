@@ -4,22 +4,22 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
 )
 
 func TestY(t *testing.T) {
-	c := NewY(mem.New())
-	c.Memory.Slots[0] = []byte("FOO")
-	c.Memory.Slots[1] = []byte("BAR")
+	y := NewY(mem.New())
+	y.Memory.Slots[0] = []byte("FOO")
+	y.Memory.Slots[1] = []byte("BAR")
+	y.Memory.Slots[3] = []byte("BAZ")
 
-	etc.Times(2, func(i int) {
-		c.Memory.Clear(c.Memory.Destination)
-		assert.Equal(t, 0, c.Run([]string{"1"}))
-		assert.Equal(t, c.Format(i, c.Memory.Slots[i]), *c.Memory.Buffers[c.Memory.Destination])
-	})
+	for _, i := range []int{0, 1, 3} {
+		y.Memory.Clear(y.Memory.Destination)
+		assert.Equal(t, 0, y.Run([]string{"1"}))
+		assert.Equal(t, y.Format(i, y.Memory.Slots[i]), *y.Memory.Buffers[y.Memory.Destination])
+		assert.Equal(t, i+1, y.SlotNum)
+	}
 
-	c.SlotNum = len(c.Memory.Slots) - 1
-	assert.Equal(t, 1, c.Run([]string{"1"}))
-	assert.Equal(t, 0, c.SlotNum)
+	assert.Equal(t, 1, y.Run([]string{"1"}))
+	assert.Equal(t, 0, y.SlotNum)
 }

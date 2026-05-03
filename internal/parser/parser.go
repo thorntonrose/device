@@ -18,16 +18,24 @@ const (
 
 var SingleCommandPattern = regexp.MustCompile(`^` + script.CommandPattern.String() + `$`)
 
+type Parser struct {
+	Script script.Script
+}
+
+func New(script script.Script) Parser {
+	return Parser{Script: script}
+}
+
 // Syntax:
 //
 // <program> ::= <statement>+
-// <statement> ::= (<comment> | <assignment> | <script>)+
+// <statement> ::= <comment> | <data-directive> | <script-directive>
 // <comment> ::= ';'[<text>]<newline>
 //
-// <assignment> ::= <slot>'='<text><eol>
+// <data-directive> ::= <slot>'='<text><eol>
 // <slot> ::= ['0']*<digit>+
 //
-// <script> ::= (<slot>'$'(<space>*<command>[<eol>])+
+// <script-directive> ::= <slot>'$'(<space>*<command>[<eol>])+
 // <command> ::= ['+' | '*']<'A'..'Z'>[<parameters>]
 // <parameters> ::= <parameter>('.'<parameter>)*
 // <parameter> ::= '#'<digit> | ['-']<integer> | "'"<text>"'"
@@ -36,21 +44,22 @@ var SingleCommandPattern = regexp.MustCompile(`^` + script.CommandPattern.String
 //
 // Example:
 //
+// ; program
 // 002=FOO
 // 003=123
-// 020$X
-// 021$X1.-2.#3.'A1!' ; not a real command
-func Parse(program string) map[int][]byte {
-	log.Printf("Parse ...")
+// 020$X              ; src -> dest
+// 021$Y1.-2.#3.'A1!' ; not a real command
+func (self Parser) Parse(program string) map[int][]byte {
+	log.Println("Parse")
 	data := map[int][]byte{}
 	lines := strings.Split(program, "\n")
 	index := 0
 
 	for index < len(lines) {
-		log.Printf("parser.Parse: line: %d, %s", index, lines[index])
+		log.Printf("parser.Parse: line: %d, %s\n", index, lines[index])
 
-		newIndex, slotNum, value := Statement(lines, index)
-		log.Printf("parser.Parse: slot: %d, value: %s", slotNum, value)
+		newIndex, slotNum, value := self.Statement(lines, index)
+		log.Printf("parser.Parse: newIndex: %d, slot: %d, value: %s\n", newIndex, slotNum, value)
 
 		data[slotNum] = value
 		index = newIndex
@@ -62,74 +71,85 @@ func Parse(program string) map[int][]byte {
 
 //-----------------------------------------------------------------------------
 
-func Statement(lines []string, index int) (int, int, []byte) {
-	if IsBlank(lines[index]) || IsComment(lines[index]) {
+func (self Parser) Statement(lines []string, index int) (int, int, []byte) {
+	if self.IsBlank(lines[index]) || self.IsComment(lines[index]) {
 		return index + 1, 0, nil
 	}
 
-	return Directive(lines, index)
+	return self.Directive(lines, index)
 }
 
-func IsBlank(line string) bool {
+func (self Parser) IsBlank(line string) bool {
 	return strings.TrimSpace(line) == ""
 }
 
-func IsComment(line string) bool {
+func (self Parser) IsComment(line string) bool {
 	return strings.HasPrefix(strings.TrimSpace(line), CommentMarker)
 }
 
-func Directive(lines []string, index int) (int, int, []byte) {
-	if slot, value := Assignment(lines[index], "="); value != nil {
+func (self Parser) Directive(lines []string, index int) (int, int, []byte) {
+	if slot, value := self.DataDirective(lines[index], "="); value != nil {
 		return index + 1, slot, value
 	}
 
-	return Script(lines, index)
+	return self.ScriptDirective(lines, index)
 }
 
 //-----------------------------------------------------------------------------
 
-func Assignment(line string, sep string) (int, []byte) {
+func (self Parser) DataDirective(line string, sep string) (int, []byte) {
 	if tokens := strings.SplitN(line, sep, 2); len(tokens) == 2 {
-		return BufSlotNum(tokens[0]), Text(tokens[1])
+		return self.SlotNum(tokens[0]), self.Text(tokens[1])
 	}
 
 	return 0, nil
 }
 
-func BufSlotNum(token string) int {
+func (self Parser) SlotNum(token string) int {
 	defer etc.Recover(func(e error) { panic("invalid slot: " + token) })
 	return etc.Must(strconv.Atoi(etc.Value(token, "0")))
 }
 
-func Text(token string) []byte {
-	index := strings.LastIndex(token, CommentMarker)
+func (self Parser) Text(token string) []byte {
+	index := strings.Index(token, CommentMarker)
 	return []byte(token[:etc.If(index == -1, len(token), index)])
 }
 
 //-----------------------------------------------------------------------------
 
-func Script(lines []string, index int) (int, int, []byte) {
+func (self Parser) ScriptDirective(lines []string, index int) (int, int, []byte) {
 	line := lines[index]
 
-	if slot, value := Assignment(line, "$"); value != nil {
-		return Commands(lines, index+1, slot, Command(string(value)))
+	if slot, value := self.DataDirective(line, "$"); value != nil {
+		return self.Commands(lines, index+1, slot, self.Command(string(value)))
 	}
 
 	panic("invalid directive: " + line)
 }
 
-func Commands(lines []string, index int, slotNum int, value []byte) (int, int, []byte) {
+func (self Parser) Commands(lines []string, index int, slotNum int, value []byte) (newIndex int, currSlotNum int, newValue []byte) {
+	defer etc.Recover(func(e error) { newIndex, currSlotNum, newValue = self.CommandsRecover(e, index, slotNum, value) })
+
 	for index < len(lines) {
-		value = append(value, Command(string(Text(lines[index])))...)
+		value = append(value, self.Command(string(self.Text(lines[index])))...)
 		index++
 	}
 
 	return index, slotNum, value
 }
 
-func Command(line string) []byte {
+func (self Parser) CommandsRecover(e error, index int, slotNum int, value []byte) (int, int, []byte) {
+	etc.Assert(strings.Contains(e.Error(), "invalid command"), e.Error())
+	return index, slotNum, value
+}
+
+func (self Parser) Command(line string) []byte {
 	line = strings.TrimSpace(line)
-	etc.Assert(line == "" || SingleCommandPattern.MatchString(line), fmt.Sprintf("invalid command: %s", line))
+
+	if line != "" {
+		etc.Assert(SingleCommandPattern.MatchString(line), fmt.Sprintf("invalid command: %s", line))
+		etc.Assert(self.Script.IsCommand(line), fmt.Sprintf("unknown command: %s", line))
+	}
 
 	return []byte(line)
 }

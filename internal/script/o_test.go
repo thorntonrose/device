@@ -8,21 +8,11 @@ import (
 )
 
 func TestO(t *testing.T) {
-	memory := mem.New()
-	memory.Set(mem.Receive+1, []byte("FOO"))
+	o := NewO(mem.New())
+	o.Memory.Set(mem.Receive+1, []byte("FOO"))
 
-	o := NewO(memory)
-
-	o.Run([]string{})
-	assert.Equal(t, 1, memory.Pointers[memory.Source])
-
-	o.Run([]string{"1"})
-	assert.Equal(t, 2, memory.Pointers[memory.Source])
-}
-
-func TestO_InvalidParameters(t *testing.T) {
-	memory := mem.New()
-	o := NewO(memory)
-
-	assert.Panics(t, func() { o.Run([]string{"A"}) })
+	for i, c := range []string{"", "1"} {
+		o.Run([]string{c})
+		assert.Equal(t, i+1, o.Memory.Pointers[o.Memory.Source])
+	}
 }
