@@ -1,4 +1,4 @@
-; count -- count from 1 to 10
+; count-10 -- count from 1 to 10
 020$
    *N.1      ; #0 = 1
    +Q        ; dest = #0

@@ -38,8 +38,8 @@ func Usage() {
 	fmt.Printf("Usage: %s [flags] <file>\n", filepath.Base(os.Args[0]))
 	fmt.Println("Flags:")
 	fmt.Println("  -dump = dump memory at end of program")
-	fmt.Println("  -log = log file")
-	fmt.Println("  -slot = script slot number (default: 0)")
+	fmt.Println("  -log <file> = log file")
+	fmt.Println("  -slot <number> = script slot number (default: 0)")
 
 	os.Exit(1)
 }

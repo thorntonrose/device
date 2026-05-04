@@ -127,8 +127,12 @@ func (self Parser) ScriptDirective(lines []string, index int) (int, int, []byte)
 	panic("invalid directive: " + line)
 }
 
-func (self Parser) Commands(lines []string, index int, slotNum int, value []byte) (newIndex int, currSlotNum int, newValue []byte) {
-	defer etc.Recover(func(e error) { newIndex, currSlotNum, newValue = self.CommandsRecover(e, index, slotNum, value) })
+func (self Parser) Commands(lines []string, index int, slotNum int, value []byte) (newIndex int, currSlotNum int,
+	newValue []byte,
+) {
+	defer etc.Recover(func(e error) {
+		newIndex, currSlotNum, newValue = self.CommandsRecover(e, index, slotNum, value)
+	})
 
 	for index < len(lines) {
 		value = append(value, self.Command(string(self.Text(lines[index])))...)
@@ -139,7 +143,7 @@ func (self Parser) Commands(lines []string, index int, slotNum int, value []byte
 }
 
 func (self Parser) CommandsRecover(e error, index int, slotNum int, value []byte) (int, int, []byte) {
-	etc.Assert(strings.Contains(e.Error(), "invalid command"), fmt.Errorf("invalid command: %v", e))
+	etc.Assert(strings.Contains(e.Error(), "invalid command"), e)
 	return index, slotNum, value
 }
 
