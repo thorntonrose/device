@@ -36,6 +36,8 @@ func Clean() {
 func Build() {
 	fmt.Println("> Build")
 	bash("go build -o %s/%s ./cmd", BinDir, Name)
+	bash("GOOS=linux GOARCH=amd64 go build -o %s/%s-linux-amd64 ./cmd", BinDir, Name)
+	bash("GOOS=darwin GOARCH=amd64 go build -o %s/%s-darwin-amd64 ./cmd", BinDir, Name)
 }
 
 func Test() {

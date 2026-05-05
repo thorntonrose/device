@@ -1,6 +1,6 @@
 # Device
 
-...
+Device is an emulator for a fictional I/O control device. See manual.md for programming instructions.
 
 
 ## Build
@@ -16,6 +16,11 @@ To build:
 mage build
 ```
 
+Binaries will be created in `./bin/device`.
+
+
+## Test
+
 To run tests:
 
 ```
@@ -24,12 +29,3 @@ To run tests:
 
 \<path> = a Go package path, e.g. `./internal/parser`
 \<pattern> = a test name pattern, e.g. `TestParse`, `^TestParse$`
-
-
-## Run
-
-To run:
-
-```
-./bin/device [<flags>] <file>
-```
