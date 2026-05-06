@@ -26,29 +26,6 @@ func New(script script.Script) Parser {
 	return Parser{Script: script}
 }
 
-// Syntax:
-//
-// <program> ::= <statement>+
-// <statement> ::= <comment> | <data-directive> | <script-directive>
-// <comment> ::= ';'[<text>]<newline>
-//
-// <data-directive> ::= <slot>'='<text><eol>
-// <slot> ::= ['0']*<digit>+
-//
-// <script-directive> ::= <slot>'$'(<space>*<command>[<eol>])+
-// <command> ::= ['+' | '*']<'A'..'Z'>[<parameters>]
-// <parameters> ::= <parameter>('.'<parameter>)*
-// <parameter> ::= '#'<digit> | ['-']<integer> | "'"<text>"'"
-//
-// <eol> ::= <comment> | <newline>
-//
-// Example:
-//
-// ; program
-// 002=FOO
-// 003=123
-// 020$X              ; src -> dest
-// 021$Y1.-2.#3.'A1!' ; not a real command
 func (self Parser) Parse(program string) map[int][]byte {
 	log.Println("parser.Parse")
 	data := map[int][]byte{}
@@ -106,8 +83,8 @@ func (self Parser) DataDirective(line string, sep string) (int, []byte) {
 }
 
 func (self Parser) SlotNum(token string) int {
-	defer etc.Recover(func(e error) { panic("invalid slot: " + token) })
-	return etc.Must(strconv.Atoi(etc.Value(token, "0")))
+	defer etc.Recover(func(e error) { panic(fmt.Sprintf("invalid slot: '%s'", token)) })
+	return etc.Must(strconv.Atoi(token))
 }
 
 func (self Parser) Text(token string) []byte {
@@ -124,7 +101,7 @@ func (self Parser) ScriptDirective(lines []string, index int) (int, int, []byte)
 		return self.Commands(lines, index+1, slot, self.Command(string(value)))
 	}
 
-	panic("invalid directive: " + line)
+	panic(fmt.Sprintf("invalid directive: '%s'", line))
 }
 
 func (self Parser) Commands(lines []string, index int, slotNum int, value []byte) (newIndex int, currSlotNum int,
@@ -151,8 +128,8 @@ func (self Parser) Command(line string) []byte {
 	line = strings.TrimSpace(line)
 
 	if line != "" {
-		etc.Assert(SingleCommandPattern.MatchString(line), fmt.Errorf("invalid command: %s", line))
-		etc.Assert(self.Script.IsCommand(line), fmt.Errorf("unknown command: %s", line))
+		etc.Assert(SingleCommandPattern.MatchString(line), fmt.Errorf("invalid command: '%s'", line))
+		etc.Assert(self.Script.IsCommand(line), fmt.Errorf("unknown command: '%s'", line))
 	}
 
 	return []byte(line)

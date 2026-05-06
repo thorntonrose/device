@@ -1,6 +1,11 @@
 # Device
 
-Device is an emulator for a fictional I/O control device. See manual.md for programming instructions.
+Device is an emulator for a fictional I/O control device.
+
+
+## Reference Manual
+
+See [docs](docs/index.md).
 
 
 ## Build

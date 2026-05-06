@@ -22,7 +22,8 @@ func TestSlotNum(t *testing.T) {
 	p := NewTestParser()
 	assert.Equal(t, 1, p.SlotNum("001"))
 	assert.Equal(t, 1, p.SlotNum("1"))
-	assert.PanicsWithValue(t, "invalid slot: A", func() { p.SlotNum("A") })
+	assert.PanicsWithValue(t, "invalid slot: 'A'", func() { p.SlotNum("A") })
+	assert.PanicsWithValue(t, "invalid slot: ''", func() { p.SlotNum("") })
 }
 
 func TestText(t *testing.T) {
@@ -56,9 +57,9 @@ func TestCommand(t *testing.T) {
 
 func TestCommand_Invalid(t *testing.T) {
 	p := NewTestParser()
-	assert.PanicsWithError(t, "invalid command: _", func() { p.Command("_") })
-	assert.PanicsWithError(t, "invalid command: A!", func() { p.Command("A!") })
-	assert.PanicsWithError(t, "invalid command: A#12", func() { p.Command("A#12") })
+	assert.PanicsWithError(t, "invalid command: '_'", func() { p.Command("_") })
+	assert.PanicsWithError(t, "invalid command: 'A!'", func() { p.Command("A!") })
+	assert.PanicsWithError(t, "invalid command: 'A#12'", func() { p.Command("A#12") })
 }
 
 func TestCommands(t *testing.T) {
@@ -83,7 +84,7 @@ func assertScriptDirective(t *testing.T, lineNum int, slotNum int, value []byte,
 }
 
 func TestScriptDirective_Invalid(t *testing.T) {
-	assert.PanicsWithValue(t, "invalid directive: A", func() { NewTestParser().ScriptDirective([]string{"A"}, 0) })
+	assert.PanicsWithValue(t, "invalid directive: 'A'", func() { NewTestParser().ScriptDirective([]string{"A"}, 0) })
 }
 
 //-----------------------------------------------------------------------------
