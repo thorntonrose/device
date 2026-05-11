@@ -4,16 +4,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/thorntonrose/device/internal/config"
 	"github.com/thorntonrose/device/internal/mem"
+	_ "github.com/thorntonrose/device/internal/testing"
 )
-
-func TestMain(m *testing.M) {
-	defer config.InitLog()()
-	m.Run()
-}
-
-//-----------------------------------------------------------------------------
 
 func TestLoad(t *testing.T) {
 	device := New()

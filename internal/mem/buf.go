@@ -1,8 +1,6 @@
 package mem
 
-import (
-	"github.com/thorntonrose/device/internal/etc"
-)
+import "github.com/thorntonrose/device/internal/iter"
 
 func (m *Memory) ReadAll(bufNum int, maxCount int, stop byte) (data []byte) {
 	for count := 0; m.HasNext(bufNum, count, maxCount); count++ {
@@ -30,7 +28,7 @@ func (m *Memory) Read(bufNum int) byte {
 }
 
 func (m *Memory) WriteAll(bufNum int, data []byte) {
-	etc.Each(data, func(b byte) { m.Write(bufNum, b) })
+	iter.Each(data, func(b byte) { m.Write(bufNum, b) })
 }
 
 func (m *Memory) Write(bufNum int, data byte) {

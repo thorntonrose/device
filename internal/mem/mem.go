@@ -6,10 +6,13 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/thorntonrose/device/internal/etc"
+	. "github.com/thorntonrose/device/internal/etc"
+	"github.com/thorntonrose/device/internal/iter"
 )
 
 const (
+	FS = 28
+
 	MaxSlots     = 40
 	MaxBuffers   = 2
 	MaxVariables = 10
@@ -95,7 +98,7 @@ func (m *Memory) Set(slotNum int, data []byte) {
 
 func (m *Memory) Load(data map[int][]byte) {
 	log.Printf("Memory.Load: data: %v\n", data)
-	etc.EachEntry(data, func(slotNum int, value []byte) { m.Set(slotNum, value) })
+	iter.EachEntry(data, func(slotNum int, value []byte) { m.Set(slotNum, value) })
 }
 
 //-----------------------------------------------------------------------------
@@ -105,13 +108,13 @@ func (m *Memory) Dump(slotNums ...int) string {
 }
 
 func (m *Memory) SlotLines(slotNums ...int) (lines []string) {
-	etc.EachWithIndex(m.Slots, func(data []byte, i int) { lines = append(lines, m.SlotLine(data, i, slotNums...)...) })
+	iter.EachWithIndex(m.Slots, func(data []byte, i int) { lines = append(lines, m.SlotLine(data, i, slotNums...)...) })
 	return
 }
 
 func (m *Memory) SlotLine(data []byte, slotNum int, slotNums ...int) []string {
-	includeLine := etc.If(len(slotNums) == 0, len(data) > 0, slices.Contains(slotNums, slotNum))
-	return etc.If(includeLine, []string{fmt.Sprintf("%03d (%03d): %s", slotNum, cap(data), string(data))}, []string{})
+	includeLine := If(len(slotNums) == 0, len(data) > 0, slices.Contains(slotNums, slotNum))
+	return If(includeLine, []string{fmt.Sprintf("%03d (%03d): %s", slotNum, cap(data), string(data))}, []string{})
 }
 
 func (m *Memory) BufferLine() string {

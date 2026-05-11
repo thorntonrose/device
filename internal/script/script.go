@@ -6,11 +6,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/thorntonrose/device/internal/command/bufs"
-	"github.com/thorntonrose/device/internal/command/flow"
-	"github.com/thorntonrose/device/internal/command/io"
-	"github.com/thorntonrose/device/internal/command/vars"
-	"github.com/thorntonrose/device/internal/etc"
+	"github.com/thorntonrose/device/internal/command"
+	. "github.com/thorntonrose/device/internal/etc"
+	"github.com/thorntonrose/device/internal/iter"
 	"github.com/thorntonrose/device/internal/mem"
 )
 
@@ -22,33 +20,41 @@ var CommandPattern = regexp.MustCompile(`([*+]?[A-Z])((?:#\d|[-]?\d+|'[^']*'|)(?
 // var CommandPattern = regexp.MustCompile(`([*+]?[A-Z])((?:[-#]?\d+|'[^']*'|)(?:\.(?:[-#]?\d+|'[^']*'|))*)?`)
 
 type Script struct {
-	Memory  *mem.Memory
-	Runners map[string]Runner
+	Memory   *mem.Memory
+	Commands map[string]Command
 }
 
-type Runner interface {
+type Command interface {
 	Run(parameters []string) (skip int)
 }
 
 func New(memory *mem.Memory) Script {
-	return Script{Memory: memory, Runners: NewRunners(memory)}
+	script := Script{Memory: memory}
+	script.Commands = NewCommands(memory, &script)
+	log.Printf("script.New: CommandNames: %s\n", script.CommandNames())
+
+	return script
 }
 
-func NewRunners(memory *mem.Memory) map[string]Runner {
-	return map[string]Runner{
-		"+A": vars.NewPlusA(memory), // compare variable
-		"B":  bufs.NewB(memory),     // set buffers
-		"G":  bufs.NewG(memory),     // clear dest
-		"I":  flow.NewI(memory),     // compare
-		"+I": io.NewPlusI(memory),   // send/receive
-		"*N": vars.NewStarN(memory), // set variable
-		"O":  bufs.NewO(memory),     // move src pointer
-		"*O": vars.NewStarO(memory), // do variable math
-		"P":  io.NewP(memory),       // display slot
-		"+Q": vars.NewPlusQ(memory), // copy var to dest
-		"V":  io.NewV(memory),       // display buffer
-		"X":  bufs.NewX(memory),     // copy src to dest
-		"Y":  bufs.NewY(memory),     // append non-empty memory
+func NewCommands(memory *mem.Memory, script *Script) map[string]Command {
+	return map[string]Command{
+		"A":  command.NewA(memory),             // append data to dest
+		"+A": command.NewPlusA(memory),         // compare variable
+		"B":  command.NewB(memory),             // set buffers
+		"G":  command.NewG(memory),             // clear dest
+		"H":  command.NewH(memory),             // search in src
+		"I":  command.NewI(memory),             // compare
+		"+I": command.NewPlusI(memory),         // send/receive
+		"*L": command.NewStarL(memory, script), // call subroutine
+		"*M": command.NewStarM(memory),         // return from subroutine
+		"*N": command.NewStarN(memory),         // set variable
+		"O":  command.NewO(memory),             // move src pointer
+		"P":  command.NewP(memory),             // display slot
+		"*O": command.NewStarO(memory),         // do variable math
+		"+Q": command.NewPlusQ(memory),         // copy var to dest
+		"V":  command.NewV(memory),             // display buffer
+		"X":  command.NewX(memory),             // copy src to dest
+		"Y":  command.NewY(memory),             // append non-empty memory
 	}
 }
 
@@ -56,7 +62,7 @@ func NewRunners(memory *mem.Memory) map[string]Runner {
 
 func (self Script) Run(slotNum int) int {
 	log.Printf("Script.Run: slot: %d\n", slotNum)
-	return self.RunCommands(0, self.Commands(string(self.Memory.Slots[slotNum])))
+	return self.RunCommands(0, self.Parse(string(self.Memory.Slots[slotNum])))
 }
 
 func (self Script) RunCommands(index int, commands [][]string) int {
@@ -71,24 +77,31 @@ func (self Script) RunCommands(index int, commands [][]string) int {
 
 func (self Script) RunCommand(tokens []string) int {
 	log.Printf("Script.RunCommand: tokens: %v\n", tokens)
-	runner := self.Runners[tokens[1]]
-	etc.Assert(runner != nil, fmt.Errorf("unknown command: %s", tokens[1]))
+	runner := self.Commands[tokens[1]]
+	Assert(runner != nil, fmt.Errorf("unknown command: %s", tokens[1]))
 
 	return runner.Run(strings.Split(tokens[2], "."))
 }
 
-func (self Script) Commands(value string) [][]string {
+func (self Script) Parse(value string) [][]string {
 	// expect: [[<match>, <modifier><letter>, <parameters>], ...]
 	return CommandPattern.FindAllStringSubmatch(value, -1)
 }
 
 func (self Script) Next(index int, skip int) int {
-	return etc.If(skip == 0, index+1, etc.If(skip > 0, index+1+skip, index+skip))
+	return If(skip == 0, index+1, If(skip > 0, index+1+skip, index+skip))
 }
 
 //-----------------------------------------------------------------------------
 
 func (self Script) IsCommand(value string) bool {
-	name := etc.Value(self.Commands(value), [][]string{{"", ""}})[0][1]
-	return self.Runners[name] != nil
+	name := Value(self.Parse(value), [][]string{{"", ""}})[0][1]
+	return self.Commands[name] != nil
+}
+
+func (self Script) CommandNames() (names []string) {
+	names = []string{}
+	iter.EachEntry(self.Commands, func(name string, _ Command) { names = append(names, name) })
+
+	return
 }

@@ -5,36 +5,40 @@ import (
 	"log"
 	"os"
 
-	"github.com/thorntonrose/device/internal/etc"
+	. "github.com/thorntonrose/device/internal/etc"
 )
 
-var LogFile = GetEnv("LOG_FILE", "device.log")
+var LogFile = GetEnv("LOG_FILE", "")
+var LogWriter *os.File
 
 //-----------------------------------------------------------------------------
 
 func GetEnv(key, def string) string {
-	return etc.Value(os.Getenv(key), def)
+	return Value(os.Getenv(key), def)
 }
 
 //-----------------------------------------------------------------------------
 
-func InitNewLog() func() {
-	os.Remove(LogFile)
+func InitNewLog(fileName string) func() {
+	if LogFile = fileName; LogFile != "" {
+		os.Remove(LogFile)
+	}
+
 	return InitLog()
 }
 
 func InitLog() func() {
-	return etc.If(LogFile == "none", InitNopLog, InitFileLog)()
+	return If(LogFile == "", InitLogNop, InitLogFile)()
 }
 
-func InitNopLog() func() {
+func InitLogNop() func() {
 	log.SetOutput(io.Discard)
 	return func() {}
 }
 
-func InitFileLog() func() {
-	writer := etc.Must(os.OpenFile(LogFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644))
-	log.SetOutput(writer)
+func InitLogFile() func() {
+	LogWriter = Must(os.OpenFile(LogFile, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644))
+	log.SetOutput(LogWriter)
 
-	return func() { writer.Close() }
+	return func() { LogWriter.Close() }
 }

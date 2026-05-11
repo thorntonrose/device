@@ -11,40 +11,51 @@ import (
 )
 
 var (
-	Name        = "device"
+	Name    = "device"
+	Version = "0.1.0"
+
 	BinDir      = "bin"
+	DistFile    = Name + ".tgz"
+	Pkg         = "./..."
 	TempDir     = "tmp"
+	Tests       = "Test"
 	TestTempDir = TempDir + "/test"
 	WorkDir, _  = os.Getwd()
-
-	Pkg   = "./..."
-	Tests = "Test"
 
 	Env = map[string]string{}
 )
 
+//-----------------------------------------------------------------------------
+
 func Clean() {
 	fmt.Println("> Clean")
 
-	for _, path := range []string{BinDir, TempDir, "device.log"} {
+	for _, path := range []string{BinDir, TempDir, DistFile} {
 		os.RemoveAll(path)
 	}
 
-	bash("go clean -cache")
+	Bash("go clean -cache")
 }
 
 func Build() {
 	fmt.Println("> Build")
-	srcDir := "./cmd"
 
 	sh.Rm(BinDir)
-	build("", BinDir, srcDir)
-	build("GOOS=linux GOARCH=amd64", BinDir+"/linux", srcDir)
-	build("GOOS=darwin GOARCH=amd64", BinDir+"/darwin", srcDir)
+	build("", "")
+	build("linux", "amd64")
+	build("darwin", "arm64")
 }
 
-func build(prefix, dest, src string) {
-	bash("%s go build -o ./%s/%s %s", prefix, dest, Name, src)
+func build(goos, goarch string) {
+	Env["GOOS"] = goos
+	Env["GOARCH"] = goarch
+	name := strings.Replace(fmt.Sprintf("%s.%s.%s", Name, goos, goarch), "..", "", 1)
+
+	Bash("go build -ldflags '-X main.Version=%s' -o ./%s/%s ./cmd", Version, BinDir, name)
+}
+
+func Dist() {
+	Bash("tar -czf %s docs/* bin/*", DistFile)
 }
 
 func Test() {
@@ -55,12 +66,12 @@ func Test() {
 
 	sh.Rm(TestTempDir)
 	os.MkdirAll(TestTempDir, 0755)
-	bash("go test -v -tags test -run %s %s", getEnv("TESTS", Tests), getEnv("PACKAGE", Pkg))
+	Bash("go test -v -tags test -run %s %s", GetEnv("TESTS", Tests), GetEnv("PACKAGE", Pkg))
 }
 
 //-----------------------------------------------------------------------------
 
-func bash(format string, args ...any) {
+func Bash(format string, args ...any) {
 	cmd := []string{"-o", "pipefail", "-c", strings.Trim(fmt.Sprintf(format, args...), " ")}
 	fmt.Println(cmd[len(cmd)-1])
 
@@ -69,7 +80,7 @@ func bash(format string, args ...any) {
 	}
 }
 
-func getEnv(key string, def string) string {
+func GetEnv(key string, def string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
 	}

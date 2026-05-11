@@ -5,18 +5,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/thorntonrose/device/internal/config"
-	"github.com/thorntonrose/device/internal/etc"
+	"github.com/thorntonrose/device/internal/iter"
 	"github.com/thorntonrose/device/internal/mem"
 	"github.com/thorntonrose/device/internal/script"
+	_ "github.com/thorntonrose/device/internal/testing"
 )
-
-func TestMain(m *testing.M) {
-	defer config.InitLog()()
-	m.Run()
-}
-
-//-----------------------------------------------------------------------------
 
 func TestSlotNum(t *testing.T) {
 	p := NewTestParser()
@@ -50,7 +43,7 @@ func assertDataDirective(t *testing.T, slotNum int, value []byte, line string) {
 func TestCommand(t *testing.T) {
 	p := NewTestParser()
 
-	etc.Each([]string{"Z", "+Z", "*Z", "Z1", "Z.1", "Z1.1"}, func(command string) {
+	iter.Each([]string{"Z", "+Z", "*Z", "Z1", "Z.1", "Z1.1"}, func(command string) {
 		assert.Equal(t, []byte(command), p.Command(command))
 	})
 }

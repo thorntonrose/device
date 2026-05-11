@@ -30,9 +30,9 @@ func TestReadAll_Max(t *testing.T) {
 
 func TestReadAll_Stop(t *testing.T) {
 	memory := New()
-	memory.Set(Receive+1, []byte{'A', 28, 'B'})
+	memory.Set(Receive+1, []byte{'A', '\n', 'B'})
 
-	assert.Equal(t, []byte{'A'}, memory.ReadAll(Receive, 0, 28))
+	assert.Equal(t, []byte{'A'}, memory.ReadAll(Receive, 0, '\n'))
 }
 
 func TestWriteAll(t *testing.T) {

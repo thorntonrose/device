@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/thorntonrose/device/internal/etc"
+	. "github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/script"
 )
 
@@ -26,24 +26,33 @@ func New(script script.Script) Parser {
 	return Parser{Script: script}
 }
 
-func (self Parser) Parse(program string) map[int][]byte {
+//-----------------------------------------------------------------------------
+
+func (self Parser) Parse(program string) (data map[int][]byte) {
 	log.Println("parser.Parse")
-	data := map[int][]byte{}
-	lines := strings.Split(program, "\n")
-	index := 0
-
-	for index < len(lines) {
-		log.Printf("parser.Parse: line: %d, %s\n", index, lines[index])
-
-		newIndex, slotNum, value := self.Statement(lines, index)
-		log.Printf("parser.Parse: newIndex: %d, slot: %d, value: %s\n", newIndex, slotNum, value)
-
-		data[slotNum] = value
-		index = newIndex
-	}
+	data = map[int][]byte{}
+	self.ParseLines(data, strings.Split(program, "\n"), 0)
 
 	delete(data, 0)
-	return data
+	return
+}
+
+func (self Parser) ParseLines(data map[int][]byte, lines []string, index int) int {
+	log.Printf("parser.ParseLines: line: %d, %s\n", index, lines[index])
+
+	for index < len(lines) {
+		index = self.ParseLine(data, lines, index)
+	}
+
+	return index
+}
+
+func (self Parser) ParseLine(data map[int][]byte, lines []string, index int) (newIndex int) {
+	newIndex, slotNum, value := self.Statement(lines, index)
+	log.Printf("parser.ParseLines: newIndex: %d, slotNum: %d, value: %s\n", newIndex, slotNum, value)
+	data[slotNum] = value
+
+	return
 }
 
 //-----------------------------------------------------------------------------
@@ -83,13 +92,13 @@ func (self Parser) DataDirective(line string, sep string) (int, []byte) {
 }
 
 func (self Parser) SlotNum(token string) int {
-	defer etc.Recover(func(e error) { panic(fmt.Sprintf("invalid slot: '%s'", token)) })
-	return etc.Must(strconv.Atoi(token))
+	defer Recover(func(e error) { panic(fmt.Sprintf("invalid slot: '%s'", token)) })
+	return Must(strconv.Atoi(token))
 }
 
 func (self Parser) Text(token string) []byte {
 	index := strings.Index(token, CommentMarker)
-	return []byte(token[:etc.If(index == -1, len(token), index)])
+	return []byte(token[:If(index == -1, len(token), index)])
 }
 
 //-----------------------------------------------------------------------------
@@ -107,7 +116,7 @@ func (self Parser) ScriptDirective(lines []string, index int) (int, int, []byte)
 func (self Parser) Commands(lines []string, index int, slotNum int, value []byte) (newIndex int, currSlotNum int,
 	newValue []byte,
 ) {
-	defer etc.Recover(func(e error) {
+	defer Recover(func(e error) {
 		newIndex, currSlotNum, newValue = self.CommandsRecover(e, index, slotNum, value)
 	})
 
@@ -120,7 +129,7 @@ func (self Parser) Commands(lines []string, index int, slotNum int, value []byte
 }
 
 func (self Parser) CommandsRecover(e error, index int, slotNum int, value []byte) (int, int, []byte) {
-	etc.Assert(strings.Contains(e.Error(), "invalid command"), e)
+	Assert(strings.Contains(e.Error(), "invalid command"), e)
 	return index, slotNum, value
 }
 
@@ -128,8 +137,8 @@ func (self Parser) Command(line string) []byte {
 	line = strings.TrimSpace(line)
 
 	if line != "" {
-		etc.Assert(SingleCommandPattern.MatchString(line), fmt.Errorf("invalid command: '%s'", line))
-		etc.Assert(self.Script.IsCommand(line), fmt.Errorf("unknown command: '%s'", line))
+		Assert(SingleCommandPattern.MatchString(line), fmt.Errorf("invalid command: '%s'", line))
+		Assert(self.Script.IsCommand(line), fmt.Errorf("unknown command: '%s'", line))
 	}
 
 	return []byte(line)

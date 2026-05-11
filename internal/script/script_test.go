@@ -6,16 +6,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/thorntonrose/device/internal/config"
 	"github.com/thorntonrose/device/internal/mem"
+	_ "github.com/thorntonrose/device/internal/testing"
 )
-
-func TestMain(m *testing.M) {
-	defer config.InitLog()()
-	m.Run()
-}
-
-//-----------------------------------------------------------------------------
 
 func TestNext(t *testing.T) {
 	script := New(mem.New())
@@ -24,13 +17,18 @@ func TestNext(t *testing.T) {
 	assert.Equal(t, -1, script.Next(0, -1))
 }
 
-func TestCommands(t *testing.T) {
+func TestParse(t *testing.T) {
 	memory := mem.New()
 	memory.Set(20, []byte("A*B1+C1.-2.#3.'A1!'D.1E..2"))
 
-	commands := New(memory).Commands(string(memory.Slots[20]))
-	assert.Equal(t, [][]string{{"A", "A", ""}, {"*B1", "*B", "1"}, {"+C1.-2.#3.'A1!'", "+C", "1.-2.#3.'A1!'"},
-		{"D.1", "D", ".1"}, {"E..2", "E", "..2"}}, commands)
+	commands := New(memory).Parse(string(memory.Slots[20]))
+	assert.Equal(t, [][]string{
+		{"A", "A", ""},
+		{"*B1", "*B", "1"},
+		{"+C1.-2.#3.'A1!'", "+C", "1.-2.#3.'A1!'"},
+		{"D.1", "D", ".1"},
+		{"E..2", "E", "..2"},
+	}, commands)
 }
 
 func TestRunCommand(t *testing.T) {
@@ -45,27 +43,30 @@ func TestRunCommand(t *testing.T) {
 //-----------------------------------------------------------------------------
 
 func TestRun(t *testing.T) {
-	memory := mem.New()
-	*memory.Buffers[mem.Receive] = []byte("FOO")
-	memory.Set(20, []byte("Z0Z0"))
-
-	index := NewTestScript(memory).Run(20)
-	assert.Equal(t, 2, index)
+	AssertRun(t, "Z0Z0", 2, "0")
+	AssertRun(t, "Z1Z", 2, "1")
+	AssertRun(t, "Z-1Z", -1, "-1")
 }
 
-func TestRun_Skip(t *testing.T) {
-	AssertSkip(t, "Z1X", 2)
-	AssertSkip(t, "Z-1X", -1)
-}
+func AssertRun(t *testing.T, text string, expectedIndex int, expectedData string) {
+	script := NewTestScript(mem.New())
+	script.Memory.Set(20, []byte(text))
 
-func AssertSkip(t *testing.T, text string, expectedIndex int) {
-	memory := mem.New()
-	*memory.Buffers[mem.Receive] = []byte("FOO")
-	memory.Set(20, []byte(text))
-
-	index := NewTestScript(memory).Run(20)
-	assert.Equal(t, []byte{}, *memory.Buffers[mem.Transmit])
+	index := script.Run(20)
 	assert.Equal(t, expectedIndex, index)
+	assert.Equal(t, []byte(expectedData), *script.Memory.Buffers[mem.Transmit])
+}
+
+//-----------------------------------------------------------------------------
+
+func TestRun_Subroutine(t *testing.T) {
+	script := New(mem.New())
+	script.Commands["Z"] = NewZ(script.Memory)
+	script.Memory.Set(20, []byte("*L21"))
+	script.Memory.Set(21, []byte("Z0*MZ"))
+
+	script.Run(20)
+	assert.Equal(t, []byte("0"), *script.Memory.Buffers[mem.Transmit])
 }
 
 //-----------------------------------------------------------------------------
