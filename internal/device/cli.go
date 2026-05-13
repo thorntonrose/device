@@ -10,23 +10,14 @@ import (
 	. "github.com/thorntonrose/device/internal/etc"
 )
 
-var Version = "0.0.0"
-
 type Flags struct {
-	Dump    *bool
-	Log     *string
-	Slot    *int
-	Version *bool
+	Dump *bool
+	Log  *string
+	Slot *int
 }
 
 func Run() {
 	flags := ParseFlags()
-
-	if *flags.Version {
-		fmt.Println("device", Version)
-		os.Exit(0)
-	}
-
 	config.InitNewLog(*flags.Log)
 	RunProgram(flags)
 }
@@ -34,8 +25,7 @@ func Run() {
 func ParseFlags() (flags Flags) {
 	flags.Dump = flag.Bool("dump", false, "")
 	flags.Log = flag.String("log", "", "")
-	flags.Slot = flag.Int("slot", 0, "")
-	flags.Version = flag.Bool("version", false, "")
+	flags.Slot = flag.Int("slot", 20, "")
 	flag.Usage = Usage
 	flag.Parse()
 
@@ -46,9 +36,8 @@ func Usage() {
 	fmt.Printf("Usage: %s [flags] <file>\n", filepath.Base(os.Args[0]))
 	fmt.Println("Flags:")
 	fmt.Println("  -dump = dump memory at end of program")
-	fmt.Println("  -log <file> = log file")
-	fmt.Println("  -slot <number> = script slot number (default: 0)")
-	fmt.Println("  -version = print version then exit")
+	fmt.Println("  -log <file> = log to <file>")
+	fmt.Println("  -slot <number> = script slot number (default: 20)")
 
 	os.Exit(1)
 }

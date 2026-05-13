@@ -1,4 +1,5 @@
 .claude/
 bin/
+device
 *.log
 *.tgz

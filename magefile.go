@@ -11,11 +11,7 @@ import (
 )
 
 var (
-	Name    = "device"
-	Version = "0.1.0"
-
-	BinDir      = "bin"
-	DistFile    = Name + ".tgz"
+	Name        = "device"
 	Pkg         = "./..."
 	TempDir     = "tmp"
 	Tests       = "Test"
@@ -29,33 +25,14 @@ var (
 
 func Clean() {
 	fmt.Println("> Clean")
-
-	for _, path := range []string{BinDir, TempDir, DistFile} {
-		os.RemoveAll(path)
-	}
-
+	os.RemoveAll(Name)
+	os.RemoveAll(TempDir)
 	Bash("go clean -cache")
 }
 
 func Build() {
 	fmt.Println("> Build")
-
-	sh.Rm(BinDir)
-	build("", "")
-	build("linux", "amd64")
-	build("darwin", "arm64")
-}
-
-func build(goos, goarch string) {
-	Env["GOOS"] = goos
-	Env["GOARCH"] = goarch
-	outName := strings.Replace(fmt.Sprintf("%s.%s.%s", Name, goos, goarch), "..", "", 1)
-
-	Bash("go build -ldflags '-X main.Version=%s' -o ./%s/%s ./cmd/%s", Version, BinDir, outName, Name)
-}
-
-func Dist() {
-	Bash("tar -czf %s docs/* bin/*", DistFile)
+	Bash("go build -o %s .", Name)
 }
 
 func Test() {
