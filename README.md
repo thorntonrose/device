@@ -21,7 +21,7 @@ GOSUMDB=off go install github.com/thorntonrose/device@latest
 
 Prequisites:
 
-  - Go 1.26+
+  - Go 1.25+
   - Mage 1.15+
 
 To build:
