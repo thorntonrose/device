@@ -49,9 +49,9 @@ func Build() {
 func build(goos, goarch string) {
 	Env["GOOS"] = goos
 	Env["GOARCH"] = goarch
-	name := strings.Replace(fmt.Sprintf("%s.%s.%s", Name, goos, goarch), "..", "", 1)
+	outName := strings.Replace(fmt.Sprintf("%s.%s.%s", Name, goos, goarch), "..", "", 1)
 
-	Bash("go build -ldflags '-X main.Version=%s' -o ./%s/%s ./cmd", Version, BinDir, name)
+	Bash("go build -ldflags '-X main.Version=%s' -o ./%s/%s ./cmd/%s", Version, BinDir, outName, Name)
 }
 
 func Dist() {
