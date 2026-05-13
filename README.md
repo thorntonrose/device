@@ -3,17 +3,26 @@
 Device is an emulator for a fictional I/O control device.
 
 
-## Reference Manual
+## Manual
 
 See [docs](docs/manual.md).
+
+
+## Install
+
+To install:
+
+```
+GOSUMDB=off go install github.com/thorntonrose/device@latest
+```
 
 
 ## Build
 
 Prequisites:
 
-* Go 1.26+
-* Mage 1.15+
+  - Go 1.26+
+  - Mage 1.15+
 
 To build:
 
@@ -21,7 +30,7 @@ To build:
 mage build
 ```
 
-Binaries will be created in `./bin/device`.
+Output is `./device`.
 
 
 ## Test
@@ -33,4 +42,5 @@ To run tests:
 ```
 
 \<path> = a Go package path, e.g. `./internal/parser`
+
 \<pattern> = a test name pattern, e.g. `TestParse`, `^TestParse$`
