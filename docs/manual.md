@@ -164,10 +164,12 @@ Note:
 **P[m]** -- display contents of memory slot:
   - m: memory slot (default: 0)
 
-**Q[#v.b.a]** -- set variable from buffer:
+***Q[#v.b.a]** -- set variable from buffer:
   - #v: variable: #0 (default) - #9
   - b: buffer to read: 0 (default) = destination buffer, 1 - <max-buffers> = buffer
   - a: type of conversion: 0 (default) = string (“2748” -> 2748), 1 = ASCII (“V” -> 86, “XY” -> 22617 [0x5859])
+
+Note: The buffer pointer is ignored.
 
 **+Q[#v.a]** -- append variable to destination buffer:
   - #v: variable: #0 (default) - #9
