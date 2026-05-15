@@ -105,29 +105,55 @@ Scripts have 10 variables named #0 to #9. They can hold integer or character val
 
 ## Commands
 
-**A[m.s]** -- append data to destination buffer:
+### A[m.s]
+
+Append data to destination buffer.
+
+Parameters:
+
   - m: memory slot; default: 0
   - s: commands to skip if slot is empty; integer; default: 0
 
-**+A[#v.a.c.s]** -- compare variable:
+### +A[#v.a.c.s]
+
+Compare variable.
+
+Parameters:
+
   - #v: variable: #0 (default) - #9
   - a: comparison operation: 0 (default) = equal, 1 = greater than, 2 = less than
   - c: constant value (default: 0)
   - s: commands to skip if true: integer; default: 0
 
-**B[b1.b2]** -- set source and destination buffers:
+### B[b1.b2]
+
+Set source and destination buffers.
+
+Parameters:
+
   - b1: source buffer: 0 (default) = no change, 1 - \<max-buffers> = set buffer and reset pointer, 9 = reset pointer
   - b2: destination buffer: 0 (default) = no change, 1 - \<max-buffers> = set buffer
 
-**G** -- clear destination buffer
+### G
 
-**H[s.c]** -- search for string in source buffer:
+Clear destination buffer.
+
+### H[s.c]
+
+Search for string in source buffer.
+
+Parameters:
+
   - s: commands to skip if string not found; integer; default: 0
   - c: character or string to search for: 0 - 255 | '\<string>'; default 28 (ASCII FS)
 
 Note: The buffer pointer is moved to the start of the string if found and remains unchanged if the string is not found.
 
-**I[s.a.c]** -- compare value to source buffer and skip:
+### I[s.a.c]
+
+Compare value to source buffer and skip.
+
+Parameters:
   - n: commands to skip if comparison is true; integer; default: 0
   - a: comparison code: 0 (default) = true, 1 = equal, 2 = not equal, 3 = less than, 4 = greater than
   - c: constant value to compare: 0 - 255 | ‘\<string>’; default: 28 (ASCII FS)
@@ -136,56 +162,105 @@ Note:
     - Skipping past the beginning or end of the script slot terminates the script.
     - If the source buffer starting from the pointer is empty, the skip always occurs.
 
-**+I[a.t.s.n]** -- send / receive data:
+### +I[a.t.s.n]
+
+Send and receive data.
+
+Parameters:
   - a: operation code: 0 (default) = send transmit buffer to stdout, 5 = wait for n characters from stdin then append to receive buffer
   - t: reserved
   - s: number of commands to skip if data received: 0 (default)
   - n: number of characters to receive; positive integer; default: 1
 
-***Lm** -- call subroutine (script):
+### *L[m]
+
+Call subroutine (script).
+
+Parameters:
+
   - m: memory slot; default: 0
   - Note: To return from the subroutine, skip past the beginning or end of the script or run the *M command.
 
-***M** -- return from subroutine
+### *M
 
-***N[#v.c]** -- set variable to constant value:
+Return from subroutine (script).
+
+### *N[#v.c]
+
+Set variable to constant value.
+
+Parameters:
+
   - #v: variable: #0 (default) - #9
   - c: constant value (default: 0)
 
-**O[n]** -- move source buffer pointer:
+### O[n]
+
+Move source buffer pointer.
+
+Parameters:
+
   - n: number of characters to move; integer; default: 1
 
-***O[#v.o.c.s]** -- perform arithmetic on variable:
+### *O[#v.o.c.s]
+
+Perform arithmetic on variable.
+
+Parameters:
+
   - #v: variable: #0 (default) - #9
   - o: operation: 0 (default) = add, 1 = subtract, 2 = multiply, 3 = divide, 4 = modulo
   - c: constant value (default: 0)
   - s: commands to skip if result is 0: integer; default: 0
 
-**P[m]** -- display contents of memory slot:
+### P[m]
+
+Display contents of memory slot.
+
+Parameters:
+
   - m: memory slot (default: 0)
 
-***Q[#v.b.a]** -- set variable from buffer:
+### *Q[#v.b.a]
+
+Set variable from buffer.
+
+Parameters:
   - #v: variable: #0 (default) - #9
   - b: buffer to read: 0 (default) = destination buffer, 1 - <max-buffers> = buffer
   - a: type of conversion: 0 (default) = string (“2748” -> 2748), 1 = ASCII (“V” -> 86, “XY” -> 22617 [0x5859])
 
 Note: The buffer pointer is ignored.
 
-**+Q[#v.a]** -- append variable to destination buffer:
+### +Q[#v.a]
+
+Append variable to destination buffer
+
+Parameters:
+
   - #v: variable: #0 (default) - #9
   - a: type of conversion: 0 (default) = string (2748 -> “2748”), 1 = ASCII (86 -> “V”, 22617 -> “XY”)
 
-**V[b]** -- display contents of buffer:
+### V[b]
+
+Display contents of buffer.
+
+Parameters:
   - b: buffer: 0 - <max-buffers>, 0 (default) = destination buffer
 
-**X[n.c]** -- copy source buffer to destination buffer (moving pointer):
+### X[n.c]
+
+Copy source buffer to destination buffer (moving pointer).
+
+Parameters:
+
   - n: number of characters to copy: 0 (default) = copy to stop character
   - c: stop character: 0 (default) = end of buffer
 
-**Y[s]** -- append next non-empty memory slot to destination buffer:
+### Y[s]
+
+Append next non-empty memory slot to destination buffer.
+
+Parameters:
+
   - s: commands to skip after all memory slots are read; integer; default: 0
-
-
-## Examples
-
-See docs/examples.

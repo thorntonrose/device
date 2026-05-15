@@ -45,13 +45,14 @@ func NewCommands(memory *mem.Memory, script *Script) map[string]Command {
 		"H":  command.NewH(memory),             // search in src
 		"I":  command.NewI(memory),             // compare
 		"+I": command.NewPlusI(memory),         // send/receive
-		"*L": command.NewStarL(memory, script), // call subroutine
-		"*M": command.NewStarM(memory),         // return from subroutine
+		"*L": command.NewStarL(memory, script), // call
+		"*M": command.NewStarM(memory),         // return
 		"*N": command.NewStarN(memory),         // set variable
 		"O":  command.NewO(memory),             // move src pointer
-		"P":  command.NewP(memory),             // display slot
 		"*O": command.NewStarO(memory),         // do variable math
-		"+Q": command.NewPlusQ(memory),         // copy var to dest
+		"P":  command.NewP(memory),             // display slot
+		"*Q": command.NewStarQ(memory),         // set variable from buffer
+		"+Q": command.NewPlusQ(memory),         // copy variable to dest
 		"V":  command.NewV(memory),             // display buffer
 		"X":  command.NewX(memory),             // copy src to dest
 		"Y":  command.NewY(memory),             // append non-empty memory

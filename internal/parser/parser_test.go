@@ -120,6 +120,11 @@ func TestParse(t *testing.T) {
 	assert.Equal(t, map[int][]byte{2: []byte("FOO"), 20: []byte("Z"), 21: []byte("Z1.2")}, data)
 }
 
+func TestParse_DuplicateSlot(t *testing.T) {
+	program := strings.Join([]string{"002=FOO", "002=BAR"}, "\n")
+	assert.PanicsWithValue(t, "duplicate slot: '2'", func() { NewTestParser().Parse(program) })
+}
+
 //-----------------------------------------------------------------------------
 
 func NewTestParser() Parser {

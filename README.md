@@ -5,7 +5,7 @@ Device is an emulator for a fictional I/O control device.
 
 ## Manual
 
-See [docs](docs/manual.md).
+See [manual.md](manual.md).
 
 
 ## Install

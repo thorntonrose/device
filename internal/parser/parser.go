@@ -11,10 +11,7 @@ import (
 	"github.com/thorntonrose/device/internal/script"
 )
 
-const (
-	CommentMarker = ";"
-	SlotLength    = 3
-)
+const CommentMarker = ";"
 
 var SingleCommandPattern = regexp.MustCompile(`^` + script.CommandPattern.String() + `$`)
 
@@ -49,9 +46,13 @@ func (self Parser) ParseLines(data map[int][]byte, lines []string, index int) in
 
 func (self Parser) ParseLine(data map[int][]byte, lines []string, index int) (newIndex int) {
 	newIndex, slotNum, value := self.Statement(lines, index)
-	log.Printf("parser.ParseLines: newIndex: %d, slotNum: %d, value: %s\n", newIndex, slotNum, value)
-	data[slotNum] = value
+	log.Printf("parser.ParseLine: newIndex: %d, slotNum: %d, value: %s\n", newIndex, slotNum, value)
 
+	if _, ok := data[slotNum]; ok {
+		panic(fmt.Sprintf("duplicate slot: '%d'", slotNum))
+	}
+
+	data[slotNum] = value
 	return
 }
 
