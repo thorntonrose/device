@@ -9,12 +9,13 @@ import (
 )
 
 func TestB_NoChange(t *testing.T) {
-	memory := mem.New()
-	b := NewB(memory)
+	b := NewB(mem.New())
+	b.Memory.Pointers[mem.Receive] = 1
 
 	b.Run([]string{})
-	assert.Equal(t, mem.Receive, memory.Source)
-	assert.Equal(t, mem.Transmit, memory.Destination)
+	assert.Equal(t, mem.Receive, b.Memory.Source)
+	assert.Equal(t, mem.Transmit, b.Memory.Destination)
+	assert.Equal(t, 1, b.Memory.Pointers[mem.Receive])
 
 	assert.Panics(t, func() { b.Run([]string{"6"}) })
 	assert.Panics(t, func() { b.Run([]string{"", "6"}) })

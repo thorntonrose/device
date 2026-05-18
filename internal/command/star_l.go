@@ -21,9 +21,9 @@ func NewStarL(memory *mem.Memory, script Script) StarL {
 }
 
 func (self StarL) Run(parameters []string) (skip int) {
-	log.Printf("StarL.Run: %v\n", parameters)
 	m := self.Int("m (memory slot)", parameters, 0, 0)
-	self.Script.Run(m)
+	log.Printf("*L.Run: m: %d\n", m)
 
+	self.Script.Run(m)
 	return
 }

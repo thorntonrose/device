@@ -19,9 +19,9 @@ func NewV(memory *mem.Memory) V {
 }
 
 func (self V) Run(parameters []string) (skip int) {
-	log.Printf("V.Run: %v\n", parameters)
 	b := self.Range("b (buffer)", parameters, 0, 0, 0, mem.MaxBuffers)
-	fmt.Fprintln(os.Stderr, string(*self.Memory.Buffers[Value(b, self.Memory.Destination)]))
+	log.Printf("V.Run: b: %d\n", b)
 
+	fmt.Fprintln(os.Stderr, string(*self.Memory.Buffers[Value(b, self.Memory.Destination)]))
 	return
 }

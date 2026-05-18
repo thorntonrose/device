@@ -46,13 +46,13 @@ func (self Parser) ParseLines(data map[int][]byte, lines []string, index int) in
 
 func (self Parser) ParseLine(data map[int][]byte, lines []string, index int) (newIndex int) {
 	newIndex, slotNum, value := self.Statement(lines, index)
-	log.Printf("parser.ParseLine: newIndex: %d, slotNum: %d, value: %s\n", newIndex, slotNum, value)
 
-	if _, ok := data[slotNum]; ok {
-		panic(fmt.Sprintf("duplicate slot: '%d'", slotNum))
+	if value != nil {
+		log.Printf("parser.ParseLine: newIndex: %d, slotNum: %d, value: %s\n", newIndex, slotNum, value)
+		Assert(len(data[slotNum]) == 0, fmt.Errorf("duplicate slot: '%d'", slotNum))
+		data[slotNum] = value
 	}
 
-	data[slotNum] = value
 	return
 }
 

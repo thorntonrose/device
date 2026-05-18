@@ -19,11 +19,11 @@ func NewPlusQ(memory *mem.Memory) PlusQ {
 }
 
 func (self PlusQ) Run(parameters []string) (skip int) {
-	log.Printf("PlusQ.Run: %v\n", parameters)
 	v := self.Variable("#v (variable)", parameters, 0, 0)
 	a := self.Code("a (conversion)", parameters, 1, 0, []int{0, 1})
-	self.Memory.WriteAll(self.Memory.Destination, If(a == 0, self.ToString(v), self.ToASCII(v)))
+	log.Printf("+Q.Run: v: %d, a: %d\n", v, a)
 
+	self.Memory.WriteAll(self.Memory.Destination, If(a == 0, self.ToString(v), self.ToASCII(v)))
 	return
 }
 

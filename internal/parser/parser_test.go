@@ -110,10 +110,13 @@ func assertStatement(t *testing.T, lineNum int, slotNum int, value []byte, lines
 
 func TestParse(t *testing.T) {
 	program := strings.Join([]string{
-		"; test",
+		"; program",
 		"002=FOO",
+		"",
+		"; main",
 		"020$Z    ; do z",
-		"021$Z1.2 ; do z with 1.2",
+		"021$",
+		"   Z1.2 ; do z with 1.2",
 	}, "\n")
 
 	data := NewTestParser().Parse(program)
@@ -122,7 +125,7 @@ func TestParse(t *testing.T) {
 
 func TestParse_DuplicateSlot(t *testing.T) {
 	program := strings.Join([]string{"002=FOO", "002=BAR"}, "\n")
-	assert.PanicsWithValue(t, "duplicate slot: '2'", func() { NewTestParser().Parse(program) })
+	assert.PanicsWithError(t, "duplicate slot: '2'", func() { NewTestParser().Parse(program) })
 }
 
 //-----------------------------------------------------------------------------

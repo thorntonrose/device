@@ -18,8 +18,9 @@ func NewX(memory *mem.Memory) X {
 func (self X) Run(parameters []string) (skip int) {
 	n := self.NonNegative("n (characters)", parameters, 0, 0)
 	c := self.Range("c (stop character)", parameters, 1, 0, 0, 255)
-	self.Copy(n, byte(c))
+	log.Printf("X.Run: n: %d, c: %d\n", n, c)
 
+	self.Copy(n, byte(c))
 	return
 }
 

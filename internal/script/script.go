@@ -41,6 +41,7 @@ func NewCommands(memory *mem.Memory, script *Script) map[string]Command {
 		"A":  command.NewA(memory),             // append data to dest
 		"+A": command.NewPlusA(memory),         // compare variable
 		"B":  command.NewB(memory),             // set buffers
+		"D":  command.NewD(memory),             // delete from dest
 		"G":  command.NewG(memory),             // clear dest
 		"H":  command.NewH(memory),             // search in src
 		"I":  command.NewI(memory),             // compare

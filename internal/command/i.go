@@ -17,10 +17,10 @@ func NewI(memory *mem.Memory) I {
 }
 
 func (self I) Run(parameters []string) (skip int) {
-	log.Printf("I.Run: %v\n", parameters)
 	s := self.Int("s (skip)", parameters, 0, 0)
 	a := self.Code("a (comparison)", parameters, 1, 0, []int{0, 1, 2, 3, 4})
-	c := string(self.Bytes("c (constant)", parameters, 2, []byte{mem.FS}))
+	c := string(self.Bytes("c (constant)", parameters, 2, []byte{'\t'}))
+	log.Printf("I.Run: s: %d, a: %d, c: %s\n", s, a, c)
 
 	return If(self.Compare(self.Data(c), a, c), s, 0)
 }

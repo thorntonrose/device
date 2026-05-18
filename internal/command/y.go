@@ -19,8 +19,8 @@ func NewY(memory *mem.Memory) *Y {
 }
 
 func (self *Y) Run(parameters []string) (skip int) {
-	log.Printf("Y.Run: %v\n", parameters)
 	s := self.Int("s (skip)", parameters, 0, 0)
+	log.Printf("Y.Run: s: %d\n", s)
 
 	return If(self.AppendNextNonEmpty() == 0, s, 0)
 }

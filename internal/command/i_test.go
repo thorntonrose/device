@@ -10,7 +10,7 @@ import (
 
 func TestI(t *testing.T) {
 	i := NewI(mem.New())
-	*i.Memory.Buffers[mem.Receive] = []byte{mem.FS}
+	*i.Memory.Buffers[mem.Receive] = []byte{'\t'}
 
 	assert.Equal(t, 0, i.Run([]string{}))               // nop
 	assert.Equal(t, 1, i.Run([]string{"1"}))            // true

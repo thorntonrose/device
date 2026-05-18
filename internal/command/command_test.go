@@ -85,10 +85,10 @@ func TestRange(t *testing.T) {
 func TestBytes(t *testing.T) {
 	c := New(mem.New())
 
-	assert.Equal(t, []byte{FS}, c.Bytes("c", []string{}, 0, []byte{FS}))
-	assert.Equal(t, []byte{FS}, c.Bytes("c", []string{""}, 0, []byte{FS}))
-	assert.Equal(t, []byte{65}, c.Bytes("c", []string{"65"}, 0, []byte{FS}))
-	assert.Equal(t, []byte("A1!"), c.Bytes("c", []string{"'A1!'"}, 0, []byte{FS}))
-	assert.Panics(t, func() { c.Bytes("c", []string{"256"}, 0, []byte{FS}) })
-	assert.Panics(t, func() { c.Bytes("c", []string{"A"}, 0, []byte{FS}) })
+	assert.Equal(t, []byte{'\t'}, c.Bytes("c", []string{}, 0, []byte{'\t'}))
+	assert.Equal(t, []byte{'\t'}, c.Bytes("c", []string{""}, 0, []byte{'\t'}))
+	assert.Equal(t, []byte{65}, c.Bytes("c", []string{"65"}, 0, []byte{'\t'}))
+	assert.Equal(t, []byte("A1!"), c.Bytes("c", []string{"'A1!'"}, 0, []byte{'\t'}))
+	assert.Panics(t, func() { c.Bytes("c", []string{"256"}, 0, []byte{'\t'}) })
+	assert.Panics(t, func() { c.Bytes("c", []string{"A"}, 0, []byte{'\t'}) })
 }

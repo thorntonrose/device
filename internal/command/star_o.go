@@ -17,18 +17,18 @@ func NewStarO(memory *mem.Memory) StarO {
 }
 
 func (self StarO) Run(parameters []string) (skip int) {
-	log.Printf("StarO.Run: %v\n", parameters)
 	v := self.Variable("#v (variable)", parameters, 0, 0)
 	o := self.Code("o (operation)", parameters, 1, 0, []int{0, 1, 2, 3, 4})
 	c := self.Int("c (constant)", parameters, 2, 1)
 	s := self.Int("s (skip)", parameters, 3, 0)
+	log.Printf("*O.Run: v: %d, o: %d, c: %d, s: %d\n", v, o, c, s)
 
 	return If(self.PerformArithmetic(v, o, c) == 0, s, 0)
 }
 
 func (self StarO) PerformArithmetic(v, o, c int) (result int) {
 	result = self.Calculate(self.Memory.Variables[v], o, c)
-	log.Printf("StarO.PerformArithmetic: result: %d\n", result)
+	log.Printf("*O.PerformArithmetic: result: %d\n", result)
 	self.Memory.Variables[v] = result
 
 	return

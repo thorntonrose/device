@@ -18,9 +18,9 @@ func NewP(memory *mem.Memory) P {
 }
 
 func (self P) Run(parameters []string) (skip int) {
-	log.Printf("P.Run: %v\n", parameters)
 	m := self.Range("m (memory slot)", parameters, 0, 0, 0, mem.MaxSlots-1)
-	fmt.Fprintf(os.Stderr, "%03d:%s\n", m, string(self.Memory.Slots[m]))
+	log.Printf("P.Run: m: %d\n", m)
 
+	fmt.Fprintf(os.Stderr, "%03d:%s\n", m, string(self.Memory.Slots[m]))
 	return
 }

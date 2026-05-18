@@ -1,7 +1,12 @@
 package command
 
-import "github.com/thorntonrose/device/internal/mem"
+import (
+	"log"
 
+	"github.com/thorntonrose/device/internal/mem"
+)
+
+// *M -- return from subroutine (script)
 type StarM struct {
 	Command
 }
@@ -11,5 +16,6 @@ func NewStarM(memory *mem.Memory) StarM {
 }
 
 func (c StarM) Run(parameters []string) (skip int) {
+	log.Println("*M.Run")
 	return mem.MaxBufferSize + 1
 }

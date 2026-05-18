@@ -9,8 +9,6 @@ import (
 	"github.com/thorntonrose/device/internal/mem"
 )
 
-const FS = 28 // ASCII FS
-
 type Command struct {
 	Memory *mem.Memory
 }

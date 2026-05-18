@@ -134,6 +134,14 @@ Parameters:
   - b1: source buffer: 0 (default) = no change, 1 - \<max-buffers> = set buffer and reset pointer, 9 = reset pointer
   - b2: destination buffer: 0 (default) = no change, 1 - \<max-buffers> = set buffer
 
+### D[n]
+
+Delete characters from end of destination buffer.
+
+Parameters:
+
+  - n: number of characters to delete; integer; default: 1
+
 ### G
 
 Clear destination buffer.
@@ -145,7 +153,7 @@ Search for string in source buffer.
 Parameters:
 
   - s: commands to skip if string not found; integer; default: 0
-  - c: character or string to search for: 0 - 255 | '\<string>'; default 28 (ASCII FS)
+  - c: character or string to search for: 0 - 255 | '\<string>'; default: tab (ASCII 9)
 
 Note: The buffer pointer is moved to the start of the string if found and remains unchanged if the string is not found.
 
@@ -156,7 +164,7 @@ Compare value to source buffer and skip.
 Parameters:
   - n: commands to skip if comparison is true; integer; default: 0
   - a: comparison code: 0 (default) = true, 1 = equal, 2 = not equal, 3 = less than, 4 = greater than
-  - c: constant value to compare: 0 - 255 | ‘\<string>’; default: 28 (ASCII FS)
+  - c: constant value to compare: 0 - 255 | ‘\<string>’; default: tab (ASCII 9)
 
 Note:
     - Skipping past the beginning or end of the script slot terminates the script.
@@ -167,7 +175,7 @@ Note:
 Send and receive data.
 
 Parameters:
-  - a: operation code: 0 (default) = send transmit buffer to stdout, 5 = wait for n characters from stdin then append to receive buffer
+  - a: operation code: 0 (default) = send transmit buffer to stdout, 1 = send with newline, 5 = wait for n characters from stdin then append to receive buffer
   - t: reserved
   - s: number of commands to skip if data received: 0 (default)
   - n: number of characters to receive; positive integer; default: 1
@@ -234,7 +242,7 @@ Note: The buffer pointer is ignored.
 
 ### +Q[#v.a]
 
-Append variable to destination buffer
+Append variable to destination buffer.
 
 Parameters:
 

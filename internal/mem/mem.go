@@ -11,8 +11,6 @@ import (
 )
 
 const (
-	FS = 28
-
 	MaxSlots     = 40
 	MaxBuffers   = 2
 	MaxVariables = 10
@@ -29,7 +27,7 @@ const (
 // --------		----	-----------
 // 000 - 001	-		reserved
 // 002			250	buffer 1 (transmit)
-// 003			250	buffer 2 (selfeive)
+// 003			250	buffer 2 (receive)
 // 004 - 019	-		reserved
 // 020 - 039	120	general purpose
 type Memory struct {
@@ -74,49 +72,48 @@ func AddSlot(slots *[][]byte, i int, size int) {
 	// }
 }
 
-func NewBuffers(m *Memory) []*[]byte {
+func NewBuffers(self *Memory) []*[]byte {
 	buffers := make([]*[]byte, MaxBuffers+1)
-	buffers[Transmit] = &m.Slots[Transmit+1]
-	buffers[Receive] = &m.Slots[Receive+1]
+	buffers[Transmit] = &self.Slots[Transmit+1]
+	buffers[Receive] = &self.Slots[Receive+1]
 
 	return buffers
 }
 
 //-----------------------------------------------------------------------------
 
-func (m *Memory) Set(slotNum int, data []byte) {
-	m.Slots[slotNum] = m.Slots[slotNum][:len(data)]
-	copy(m.Slots[slotNum], data)
+func (self *Memory) Set(slotNum int, data []byte) {
+	self.Slots[slotNum] = self.Slots[slotNum][:len(data)]
+	copy(self.Slots[slotNum], data)
 }
 
-// ???: Needed?
-// func (m *Memory) Append(slotNum int, data []byte) {
-// 	size := len(data)
-// 	m.Slots[slotNum] = m.Slots[slotNum][:len(m.Slots[slotNum])+size]
-// 	copy(m.Slots[slotNum][len(m.Slots[slotNum])-size:], data)
-// }
-
-func (m *Memory) Load(data map[int][]byte) {
-	log.Printf("Memory.Load: data: %v\n", data)
-	iter.EachEntry(data, func(slotNum int, value []byte) { m.Set(slotNum, value) })
+func (self *Memory) Load(data map[int][]byte) {
+	log.Printf("Memory.Load")
+	iter.EachEntry(data, func(slotNum int, value []byte) { self.Set(slotNum, value) })
 }
 
 //-----------------------------------------------------------------------------
 
-func (m *Memory) Dump(slotNums ...int) string {
-	return strings.Join(append([]string{m.BufferLine()}, m.SlotLines(slotNums...)...), "\n")
+func (self *Memory) Dump(slotNums ...int) string {
+	lines := []string{
+		fmt.Sprintf("SRC:  %d", self.Source),
+		fmt.Sprintf("DEST: %d", self.Destination),
+		fmt.Sprintf("PTRS: %v", self.Pointers[1:]),
+		fmt.Sprintf("VARS: %v", self.Variables),
+	}
+
+	return strings.Join(append(lines, self.SlotLines(slotNums...)...), "\n")
 }
 
-func (m *Memory) SlotLines(slotNums ...int) (lines []string) {
-	iter.EachWithIndex(m.Slots, func(data []byte, i int) { lines = append(lines, m.SlotLine(data, i, slotNums...)...) })
+func (self *Memory) SlotLines(slotNums ...int) (lines []string) {
+	iter.EachWithIndex(self.Slots, func(data []byte, i int) {
+		lines = append(lines, self.SlotLine(data, i, slotNums...)...)
+	})
+
 	return
 }
 
-func (m *Memory) SlotLine(data []byte, slotNum int, slotNums ...int) []string {
+func (self *Memory) SlotLine(data []byte, slotNum int, slotNums ...int) []string {
 	includeLine := If(len(slotNums) == 0, len(data) > 0, slices.Contains(slotNums, slotNum))
-	return If(includeLine, []string{fmt.Sprintf("%03d (%03d): %s", slotNum, cap(data), string(data))}, []string{})
-}
-
-func (m *Memory) BufferLine() string {
-	return fmt.Sprintf("S: %d, D: %d, P: %v", m.Source, m.Destination, m.Pointers)
+	return If(includeLine, []string{fmt.Sprintf("%03d:  %s", slotNum, string(data))}, []string{})
 }

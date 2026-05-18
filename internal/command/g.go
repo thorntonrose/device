@@ -16,8 +16,7 @@ func NewG(memory *mem.Memory) G {
 }
 
 func (self G) Run(_ []string) (skip int) {
-	log.Printf("G.Run: clear: %d\n", self.Memory.Destination)
+	log.Printf("G.Run: dest: %d\n", self.Memory.Destination)
 	self.Memory.Clear(self.Memory.Destination)
-
 	return
 }

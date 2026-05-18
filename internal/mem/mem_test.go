@@ -49,13 +49,6 @@ func TestSet(t *testing.T) {
 	assert.Equal(t, data, memory.Slots[20])
 }
 
-// func TestAppend(t *testing.T) {
-// 	memory := New()
-
-// 	memory.Append(20, []byte{'A'})
-// 	assert.Equal(t, []byte{'A'}, memory.Slots[20])
-// }
-
 func TestLoad(t *testing.T) {
 	memory := New()
 	data := map[int][]byte{20: []byte("FOO"), 21: []byte("BAR")}
@@ -71,6 +64,15 @@ func TestDump(t *testing.T) {
 	memory.Set(3, []byte("B"))
 	memory.Set(20, []byte("C"))
 
-	lines := []string{"S: 2, D: 1, P: [0 0 0]", "002 (250): A", "003 (250): B", "020 (120): C"}
+	lines := []string{
+		"SRC:       2",
+		"DEST:      1",
+		"PTR:       [0 0]",
+		"VAR:       [0 0 0 0 0 0 0 0 0 0]",
+		"002 (250): A",
+		"003 (250): B",
+		"020 (120): C",
+	}
+
 	assert.Equal(t, strings.Join(lines, "\n"), memory.Dump(2, 3, 20))
 }

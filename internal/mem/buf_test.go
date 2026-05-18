@@ -50,3 +50,14 @@ func TestClear(t *testing.T) {
 	memory.Clear(Transmit)
 	assert.Equal(t, []byte{}, *memory.Buffers[Transmit])
 }
+
+func TestTrim(t *testing.T) {
+	memory := New()
+	memory.WriteAll(Transmit, []byte{'A', 'B', 'C'})
+
+	memory.Trim(Transmit, 2)
+	assert.Equal(t, []byte{'A'}, *memory.Buffers[Transmit])
+
+	memory.Trim(Transmit, 2)
+	assert.Equal(t, []byte{}, *memory.Buffers[Transmit])
+}
