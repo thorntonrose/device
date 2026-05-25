@@ -7,7 +7,7 @@ import (
 	"github.com/thorntonrose/device/internal/mem"
 )
 
-// *O[#v.o.c.s] -- perform arithmetic on variable
+// *O[#v.o.c.s] -- do math operation on variable
 type StarO struct {
 	Command
 }
@@ -21,32 +21,15 @@ func (self StarO) Run(parameters []string) (skip int) {
 	o := self.Code("o (operation)", parameters, 1, 0, []int{0, 1, 2, 3, 4})
 	c := self.Int("c (constant)", parameters, 2, 1)
 	s := self.Int("s (skip)", parameters, 3, 0)
-	log.Printf("*O.Run: v: %d, o: %d, c: %d, s: %d\n", v, o, c, s)
+	log.Printf("*O: v: %d, o: %d, c: %d, s: %d\n", v, o, c, s)
 
-	return If(self.PerformArithmetic(v, o, c) == 0, s, 0)
+	return If(self.DoMath(v, o, c) == 0, s, 0)
 }
 
-func (self StarO) PerformArithmetic(v, o, c int) (result int) {
-	result = self.Calculate(self.Memory.Variables[v], o, c)
-	log.Printf("*O.PerformArithmetic: result: %d\n", result)
-	self.Memory.Variables[v] = result
+func (self StarO) DoMath(v, o, c int) (val int) {
+	val = self.Calculate(self.Memory.Variables[v], o, c)
+	log.Printf("*DoMath: val: %d\n", val)
+	self.Memory.Variables[v] = val
 
 	return
-}
-
-func (self StarO) Calculate(v, o, c int) int {
-	switch o {
-	case 0:
-		return v + c
-	case 1:
-		return v - c
-	case 2:
-		return v * c
-	case 3:
-		return v / c
-	case 4:
-		return v % c
-	default:
-		return 0
-	}
 }

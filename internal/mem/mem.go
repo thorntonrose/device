@@ -11,25 +11,17 @@ import (
 )
 
 const (
-	MaxSlots     = 40
-	MaxBuffers   = 2
-	MaxVariables = 10
-
+	MaxBuffers      = 5
 	MaxBufferSize   = 250
 	MaxGeneralSize  = 120
 	MaxReservedSize = 60
+	MaxSlots        = 1000
+	MaxVariables    = 10
 
 	Transmit = 1
 	Receive  = 2
 )
 
-// Slot #		Size	Description
-// --------		----	-----------
-// 000 - 001	-		reserved
-// 002			250	buffer 1 (transmit)
-// 003			250	buffer 2 (receive)
-// 004 - 019	-		reserved
-// 020 - 039	120	general purpose
 type Memory struct {
 	Slots       [][]byte
 	Buffers     []*[]byte
@@ -49,27 +41,21 @@ func New() *Memory {
 
 func NewSlots() [][]byte {
 	slots := make([][]byte, MaxSlots)
-	AddBlock(&slots, 0, 1, MaxReservedSize)
-	AddBlock(&slots, 2, 3, MaxBufferSize)
-	AddBlock(&slots, 4, 19, MaxReservedSize)
-	AddBlock(&slots, 20, 39, MaxGeneralSize)
+	AddSlots(&slots, 0, 1, MaxReservedSize)
+	AddSlots(&slots, 2, 6, MaxBufferSize)
+	AddSlots(&slots, 7, 19, MaxReservedSize)
+	AddSlots(&slots, 20, 99, MaxGeneralSize)
+	AddSlots(&slots, 100, 112, MaxReservedSize)
+	AddSlots(&slots, 113, 949, MaxGeneralSize)
+	AddSlots(&slots, 950, 999, MaxReservedSize)
 
 	return slots
 }
 
-func AddBlock(slots *[][]byte, start int, end int, size int) {
+func AddSlots(slots *[][]byte, start int, end int, size int) {
 	for i := start; i <= end; i++ {
-		AddSlot(slots, i, size)
+		(*slots)[i] = make([]byte, 0, size)
 	}
-}
-
-func AddSlot(slots *[][]byte, i int, size int) {
-	(*slots)[i] = make([]byte, 0, size)
-
-	// ???: Set slot to a generated word randomly.
-	// if size == MaxReservedSize {
-	// 	(*slots)[i] = append((*slots)[i], fmt.Sprintf("%016x", rand.Intn(math.MaxInt64-1)+1)...)
-	// }
 }
 
 func NewBuffers(self *Memory) []*[]byte {
@@ -82,19 +68,21 @@ func NewBuffers(self *Memory) []*[]byte {
 
 //-----------------------------------------------------------------------------
 
+func (self *Memory) Load(data map[int][]byte) {
+	log.Println("Load")
+	iter.EachEntry(data, func(slotNum int, value []byte) { self.Set(slotNum, value) })
+}
+
 func (self *Memory) Set(slotNum int, data []byte) {
 	self.Slots[slotNum] = self.Slots[slotNum][:len(data)]
 	copy(self.Slots[slotNum], data)
 }
 
-func (self *Memory) Load(data map[int][]byte) {
-	log.Printf("Memory.Load")
-	iter.EachEntry(data, func(slotNum int, value []byte) { self.Set(slotNum, value) })
-}
-
 //-----------------------------------------------------------------------------
 
 func (self *Memory) Dump(slotNums ...int) string {
+	log.Println("Dump")
+
 	lines := []string{
 		fmt.Sprintf("SRC:  %d", self.Source),
 		fmt.Sprintf("DEST: %d", self.Destination),

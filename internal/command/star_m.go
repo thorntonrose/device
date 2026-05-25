@@ -15,7 +15,7 @@ func NewStarM(memory *mem.Memory) StarM {
 	return StarM{New(memory)}
 }
 
-func (c StarM) Run(parameters []string) (skip int) {
-	log.Println("*M.Run")
+func (StarM) Run(parameters []string) (skip int) {
+	log.Println("*M")
 	return mem.MaxBufferSize + 1
 }

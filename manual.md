@@ -66,8 +66,12 @@ Slot Number | Size (Bytes) | Description         |
 000 - 001   | -            | reserved            |
 002         | 250          | buffer 1 (transmit) |
 003         | 250          | buffer 2 (receive)  |
-004 - 019   | -            | reserved            |
-020 - 039   | 120          | general purpose     |
+004 - 006   | -            | buffers 3-5         |
+007 - 019   | -            | reserved            |
+020 - 099   | 120          | general purpose     |
+100 - 112   | -            | reserved            |
+113 - 949   | 120          | general purpose     |
+950 - 999   | -            | reserved            |
 
 
 ## Buffers
@@ -91,7 +95,7 @@ Each virtual buffer has a pointer that indicates the current read/write position
 
 ## Variables
 
-Scripts have 10 variables named #0 to #9. They can hold integer or character values and can be referenced in any command that accepts parameters. Variables are initialized to 0 when a script starts.
+Programs have 10 variables named #0 to #9. They can hold integer or character values and can be referenced in any command that accepts parameters. Variables are initialized to 0 when a program starts.
 
 **Examples:**
 
@@ -107,7 +111,7 @@ Scripts have 10 variables named #0 to #9. They can hold integer or character val
 
 ### A[m.s]
 
-Append data to destination buffer.
+Append contents of memory slot to destination buffer, moving pointer.
 
 Parameters:
 
@@ -127,16 +131,16 @@ Parameters:
 
 ### B[b1.b2]
 
-Set source and destination buffers.
+Set source and destination buffers, optionally resetting pointers.
 
 Parameters:
 
   - b1: source buffer: 0 (default) = no change, 1 - \<max-buffers> = set buffer and reset pointer, 9 = reset pointer
-  - b2: destination buffer: 0 (default) = no change, 1 - \<max-buffers> = set buffer
+  - b2: destination buffer: 0 (default) = no change, 1 - \<max-buffers> = set buffer and reset pointer
 
 ### D[n]
 
-Delete characters from end of destination buffer.
+Delete characters from end of destination buffer, moving pointer.
 
 Parameters:
 
@@ -144,18 +148,16 @@ Parameters:
 
 ### G
 
-Clear destination buffer.
+Clear destination buffer, resetting pointer.
 
 ### H[s.c]
 
-Search for string in source buffer.
+Search for string in source buffer, moving pointer to the start of the string if found.
 
 Parameters:
 
   - s: commands to skip if string not found; integer; default: 0
   - c: character or string to search for: 0 - 255 | '\<string>'; default: tab (ASCII 9)
-
-Note: The buffer pointer is moved to the start of the string if found and remains unchanged if the string is not found.
 
 ### I[s.a.c]
 
@@ -212,7 +214,7 @@ Parameters:
 
 ### *O[#v.o.c.s]
 
-Perform arithmetic on variable.
+Do math operation on variable.
 
 Parameters:
 
@@ -235,30 +237,49 @@ Set variable from buffer.
 
 Parameters:
   - #v: variable: #0 (default) - #9
-  - b: buffer to read: 0 (default) = destination buffer, 1 - <max-buffers> = buffer
+  - b: buffer to read: 0 (default) = destination buffer, 1 - \<max-buffers> = buffer
   - a: type of conversion: 0 (default) = string (“2748” -> 2748), 1 = ASCII (“V” -> 86, “XY” -> 22617 [0x5859])
 
 Note: The buffer pointer is ignored.
 
 ### +Q[#v.a]
 
-Append variable to destination buffer.
+Append variable to destination buffer, moving pointer.
 
 Parameters:
 
   - #v: variable: #0 (default) - #9
   - a: type of conversion: 0 (default) = string (2748 -> “2748”), 1 = ASCII (86 -> “V”, 22617 -> “XY”)
 
+### R[c]
+
+Append constant value to destination buffer, moving pointer.
+
+Parameters:
+
+  - c: constant value: 0 - 255 | ‘\<string>’; default: tab (ASCII 9)
+
+### T[m.o.c.s]
+
+Do math operation on contents of memory slot, treating empty slot as 0.
+
+Parameters:
+
+  - m: memory slot: 0 (default) - \<max-memory-slots>
+  - o: operation: 0 (default) = add, 1 = subtract, 2 = multiply, 3 = divide, 4 = modulo
+  - c: constant value (default: 0)
+  - s: commands to skip if result is 0: integer; default: 0
+
 ### V[b]
 
 Display contents of buffer.
 
 Parameters:
-  - b: buffer: 0 - <max-buffers>, 0 (default) = destination buffer
+  - b: buffer: 0 - \<max-buffers>, 0 (default) = destination buffer
 
 ### X[n.c]
 
-Copy source buffer to destination buffer (moving pointer).
+Copy source buffer to destination buffer, moving pointer.
 
 Parameters:
 
@@ -267,7 +288,7 @@ Parameters:
 
 ### Y[s]
 
-Append next non-empty memory slot to destination buffer.
+Append next non-empty memory slot to destination buffer, moving pointer.
 
 Parameters:
 

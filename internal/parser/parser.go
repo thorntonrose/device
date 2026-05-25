@@ -26,7 +26,7 @@ func New(script script.Script) Parser {
 //-----------------------------------------------------------------------------
 
 func (self Parser) Parse(program string) (data map[int][]byte) {
-	log.Println("parser.Parse")
+	log.Println("Parse")
 	data = map[int][]byte{}
 	self.ParseLines(data, strings.Split(program, "\n"), 0)
 
@@ -35,8 +35,6 @@ func (self Parser) Parse(program string) (data map[int][]byte) {
 }
 
 func (self Parser) ParseLines(data map[int][]byte, lines []string, index int) int {
-	log.Printf("parser.ParseLines: line: %d, %s\n", index, lines[index])
-
 	for index < len(lines) {
 		index = self.ParseLine(data, lines, index)
 	}
@@ -44,12 +42,13 @@ func (self Parser) ParseLines(data map[int][]byte, lines []string, index int) in
 	return index
 }
 
-func (self Parser) ParseLine(data map[int][]byte, lines []string, index int) (newIndex int) {
-	newIndex, slotNum, value := self.Statement(lines, index)
+func (self Parser) ParseLine(data map[int][]byte, lines []string, index int) (nextIndex int) {
+	log.Printf("ParseLine: %d, %s\n", index, lines[index])
+	nextIndex, slotNum, value := self.Statement(lines, index)
 
 	if value != nil {
-		log.Printf("parser.ParseLine: newIndex: %d, slotNum: %d, value: %s\n", newIndex, slotNum, value)
 		Assert(len(data[slotNum]) == 0, fmt.Errorf("duplicate slot: '%d'", slotNum))
+		log.Printf("ParseLine: slot: %d, %s\n", slotNum, value)
 		data[slotNum] = value
 	}
 
@@ -114,11 +113,11 @@ func (self Parser) ScriptDirective(lines []string, index int) (int, int, []byte)
 	panic(fmt.Sprintf("invalid directive: '%s'", line))
 }
 
-func (self Parser) Commands(lines []string, index int, slotNum int, value []byte) (newIndex int, currSlotNum int,
+func (self Parser) Commands(lines []string, index int, slotNum int, value []byte) (nextIndex int, currSlotNum int,
 	newValue []byte,
 ) {
 	defer Recover(func(e error) {
-		newIndex, currSlotNum, newValue = self.CommandsRecover(e, index, slotNum, value)
+		nextIndex, currSlotNum, newValue = self.CommandsRecover(e, index, slotNum, value)
 	})
 
 	for index < len(lines) {

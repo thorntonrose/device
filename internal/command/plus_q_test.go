@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/thorntonrose/device/internal/mem"
+	"github.com/thorntonrose/device/internal/mem/buf"
 	_ "github.com/thorntonrose/device/internal/testing"
 )
 
@@ -23,7 +24,7 @@ func TestPlusQ(t *testing.T) {
 }
 
 func AssertPlusQ(t *testing.T, pq PlusQ, parameters []string, expected []byte) {
-	pq.Memory.Clear(mem.Transmit)
+	buf.Clear(pq.Memory, mem.Transmit)
 
 	pq.Run(parameters)
 	assert.Equal(t, expected, *pq.Memory.Buffers[mem.Transmit])

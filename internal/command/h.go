@@ -20,7 +20,7 @@ func NewH(memory *mem.Memory) H {
 func (self H) Run(parameters []string) (skip int) {
 	s := self.Int("s (skip)", parameters, 0, 0)
 	c := self.Bytes("c (string)", parameters, 1, []byte{'\t'})
-	log.Printf("H.Run: s: %d, c: %s\n", s, string(c))
+	log.Printf("H: s: %d, c: %v (%s)\n", s, c, string(c))
 
 	return If(self.Find(c) == -1, s, 0)
 }

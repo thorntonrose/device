@@ -18,7 +18,7 @@ func NewStarN(memory *mem.Memory) StarN {
 func (self StarN) Run(parameters []string) (skip int) {
 	v := self.Variable("#v (variable)", parameters, 0, 0)
 	c := self.Int("c (constant)", parameters, 1, 0)
-	log.Printf("*N.Run: v: %d, c: %d\n", v, c)
+	log.Printf("*N: v: %d, c: %d\n", v, c)
 
 	self.Memory.Variables[v] = c
 	return

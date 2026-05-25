@@ -104,3 +104,22 @@ func (self Command) IntFromValue(name string, parameter string) int {
 	defer Recover(func(e error) { panic(fmt.Errorf("%s: %s not integer", name, parameter)) })
 	return Must(strconv.Atoi(parameter))
 }
+
+//-----------------------------------------------------------------------------
+
+func (self Command) Calculate(v, o, c int) int {
+	switch o {
+	case 0:
+		return v + c
+	case 1:
+		return v - c
+	case 2:
+		return v * c
+	case 3:
+		return v / c
+	case 4:
+		return v % c
+	default:
+		return 0
+	}
+}

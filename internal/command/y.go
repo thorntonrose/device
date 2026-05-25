@@ -6,6 +6,7 @@ import (
 
 	. "github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
+	"github.com/thorntonrose/device/internal/mem/buf"
 )
 
 // Y[s] -- append next non-empty memory slot to destination buffer
@@ -20,7 +21,7 @@ func NewY(memory *mem.Memory) *Y {
 
 func (self *Y) Run(parameters []string) (skip int) {
 	s := self.Int("s (skip)", parameters, 0, 0)
-	log.Printf("Y.Run: s: %d\n", s)
+	log.Printf("Y: s: %d\n", s)
 
 	return If(self.AppendNextNonEmpty() == 0, s, 0)
 }
@@ -42,8 +43,8 @@ func (self *Y) NextNonEmpty() (int, []byte) {
 
 func (self *Y) Append(slotNum int, data []byte) int {
 	if slotNum != -1 {
-		log.Printf("Y.Append: slotNum: %d, data: %s\n", slotNum, string(data))
-		self.Memory.WriteAll(self.Memory.Destination, self.Format(slotNum, data))
+		log.Printf("Append: slotNum: %d, data: %s\n", slotNum, string(data))
+		buf.WriteAll(self.Memory, self.Memory.Destination, self.Format(slotNum, data))
 	}
 
 	return slotNum

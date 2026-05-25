@@ -17,7 +17,7 @@ func NewO(memory *mem.Memory) O {
 
 func (self O) Run(parameters []string) (skip int) {
 	n := self.Int("n (number to move)", parameters, 0, 1)
-	log.Printf("O.Run: n: %d\n", n)
+	log.Printf("O: n: %d\n", n)
 
 	self.Memory.Pointers[self.Memory.Source] += n
 	return

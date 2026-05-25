@@ -7,6 +7,7 @@ import (
 
 	. "github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
+	"github.com/thorntonrose/device/internal/mem/buf"
 )
 
 // +Q[#v.a] – append variable to destination buffer
@@ -21,9 +22,9 @@ func NewPlusQ(memory *mem.Memory) PlusQ {
 func (self PlusQ) Run(parameters []string) (skip int) {
 	v := self.Variable("#v (variable)", parameters, 0, 0)
 	a := self.Code("a (conversion)", parameters, 1, 0, []int{0, 1})
-	log.Printf("+Q.Run: v: %d, a: %d\n", v, a)
+	log.Printf("+Q: v: %d, a: %d\n", v, a)
 
-	self.Memory.WriteAll(self.Memory.Destination, If(a == 0, self.ToString(v), self.ToASCII(v)))
+	buf.WriteAll(self.Memory, self.Memory.Destination, If(a == 0, self.ToString(v), self.ToASCII(v)))
 	return
 }
 

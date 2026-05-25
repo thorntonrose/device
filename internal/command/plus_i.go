@@ -8,6 +8,7 @@ import (
 
 	. "github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/mem"
+	"github.com/thorntonrose/device/internal/mem/buf"
 )
 
 // +I[a.t.s.n] -- send / receive data
@@ -24,14 +25,14 @@ func (self PlusI) Run(parameters []string) (skip int) {
 	t := self.Int("t (reserved)", parameters, 1, 0)
 	s := self.Int("s (skip)", parameters, 2, 0)
 	n := self.Range("n (characters)", parameters, 3, 1, 1, mem.MaxBufferSize)
-	log.Printf("+I.Run: a: %d, t: %d, s: %d, n: %d\n", a, t, s, n)
+	log.Printf("+I: a: %d, t: %d, s: %d, n: %d\n", a, t, s, n)
 
 	return If(a == 5, func() int { return self.Receive(t, s, n) }, func() int { return self.Transmit(a) })()
 }
 
 func (self PlusI) Transmit(a int) (skip int) {
 	data := string(*self.Memory.Buffers[mem.Transmit])
-	log.Printf("+I.Transmit: %v\n", data)
+	log.Printf("Transmit: %v\n", data)
 	fmt.Print(data + If(a == 1, "\n", ""))
 
 	return
@@ -40,10 +41,10 @@ func (self PlusI) Transmit(a int) (skip int) {
 func (self *PlusI) Receive(t int, s int, n int) (skip int) {
 	reader := io.LimitReader(os.Stdin, int64(n))
 	data := Must(io.ReadAll(reader))
-	log.Printf("+I.Receive: %v (%s)\n", data, string(data))
+	log.Printf("Receive: %v (%s)\n", data, string(data))
 
 	if len(data) > 0 {
-		self.Memory.WriteAll(mem.Receive, data)
+		buf.WriteAll(self.Memory, mem.Receive, data)
 		return s
 	}
 

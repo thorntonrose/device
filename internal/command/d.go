@@ -15,10 +15,15 @@ func NewD(memory *mem.Memory) D {
 	return D{New(memory)}
 }
 
-func (d D) Run(parameters []string) (skip int) {
-	n := d.Positive("n (number of characters)", parameters, 0, 1)
-	log.Printf("D.Run: n: %d\n", n)
+func (self D) Run(parameters []string) (skip int) {
+	n := self.Positive("n (number of characters)", parameters, 0, 1)
+	log.Printf("D: n: %d\n", n)
 
-	d.Memory.Trim(mem.Transmit, n)
+	self.Trim(mem.Transmit, n)
 	return
+}
+
+func (self *D) Trim(bufNum int, n int) {
+	self.Memory.Pointers[bufNum] = max(self.Memory.Pointers[bufNum]-n, 0)
+	self.Memory.Slots[bufNum+1] = self.Memory.Slots[bufNum+1][:self.Memory.Pointers[bufNum]]
 }

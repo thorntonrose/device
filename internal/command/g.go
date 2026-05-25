@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/thorntonrose/device/internal/mem"
+	"github.com/thorntonrose/device/internal/mem/buf"
 )
 
 // G -- clear destination buffer
@@ -16,7 +17,8 @@ func NewG(memory *mem.Memory) G {
 }
 
 func (self G) Run(_ []string) (skip int) {
-	log.Printf("G.Run: dest: %d\n", self.Memory.Destination)
-	self.Memory.Clear(self.Memory.Destination)
+	log.Printf("G: dest: %d\n", self.Memory.Destination)
+	buf.Clear(self.Memory, self.Memory.Destination)
+
 	return
 }

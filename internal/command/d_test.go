@@ -5,11 +5,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/thorntonrose/device/internal/mem"
+	"github.com/thorntonrose/device/internal/mem/buf"
 )
 
 func TestD(t *testing.T) {
 	d := NewD(mem.New())
-	d.Memory.WriteAll(mem.Transmit, []byte{'A', 'B'})
+	buf.WriteAll(d.Memory, mem.Transmit, []byte{'A', 'B'})
 
 	d.Run([]string{})
 	assert.Equal(t, []byte{'A'}, *d.Memory.Buffers[mem.Transmit])
