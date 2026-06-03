@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/thorntonrose/device/internal/config"
 	. "github.com/thorntonrose/device/internal/etc"
 	"github.com/thorntonrose/device/internal/iter"
 )
@@ -32,8 +33,16 @@ type Memory struct {
 }
 
 func New() *Memory {
-	m := &Memory{Slots: NewSlots(), Pointers: make([]int, MaxBuffers+1), Variables: make([]int, MaxVariables),
-		Source: Receive, Destination: Transmit}
+	log.Println("memory.New")
+
+	m := &Memory{
+		Slots:       NewSlots(),
+		Pointers:    make([]int, MaxBuffers+1),
+		Variables:   make([]int, MaxVariables),
+		Source:      Receive,
+		Destination: Transmit,
+	}
+
 	m.Buffers = NewBuffers(m)
 
 	return m
@@ -41,18 +50,14 @@ func New() *Memory {
 
 func NewSlots() [][]byte {
 	slots := make([][]byte, MaxSlots)
-	AddSlots(&slots, 0, 1, MaxReservedSize)
-	AddSlots(&slots, 2, 6, MaxBufferSize)
-	AddSlots(&slots, 7, 19, MaxReservedSize)
-	AddSlots(&slots, 20, 99, MaxGeneralSize)
-	AddSlots(&slots, 100, 112, MaxReservedSize)
-	AddSlots(&slots, 113, 949, MaxGeneralSize)
-	AddSlots(&slots, 950, 999, MaxReservedSize)
+	iter.Each(Layouts[config.Model], func(b Block) { AddSlots(&slots, b.Start, b.End, b.Size) })
 
 	return slots
 }
 
 func AddSlots(slots *[][]byte, start int, end int, size int) {
+	log.Printf("Add: %d - %d (%d)\n", start, end, size)
+
 	for i := start; i <= end; i++ {
 		(*slots)[i] = make([]byte, 0, size)
 	}

@@ -18,13 +18,10 @@ func TestMain(m *testing.M) {
 func TestNew(t *testing.T) {
 	memory := New()
 	assert.Len(t, memory.Slots, MaxSlots)
+	// common to all device models
 	assertBlock(t, memory.Slots, 0, 1, MaxReservedSize)
-	assertBlock(t, memory.Slots, 2, 6, MaxBufferSize)
-	assertBlock(t, memory.Slots, 7, 19, MaxReservedSize)
+	assertBlock(t, memory.Slots, 2, 3, MaxBufferSize)
 	assertBlock(t, memory.Slots, 20, 99, MaxGeneralSize)
-	assertBlock(t, memory.Slots, 100, 112, MaxReservedSize)
-	assertBlock(t, memory.Slots, 113, 949, MaxGeneralSize)
-	assertBlock(t, memory.Slots, 950, 999, MaxReservedSize)
 }
 
 func assertBlock(t *testing.T, slots [][]byte, start int, end int, size int) {

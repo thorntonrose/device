@@ -48,7 +48,7 @@ func (self Parser) ParseLine(data map[int][]byte, lines []string, index int) (ne
 
 	if value != nil {
 		Assert(len(data[slotNum]) == 0, fmt.Errorf("duplicate slot: '%d'", slotNum))
-		log.Printf("ParseLine: slot: %d, %s\n", slotNum, value)
+		log.Printf("ParseLine: slot: %d, value: %s\n", slotNum, value)
 		data[slotNum] = value
 	}
 

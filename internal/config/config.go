@@ -8,14 +8,13 @@ import (
 	. "github.com/thorntonrose/device/internal/etc"
 )
 
-var LogFile = GetEnv("LOG_FILE", "")
-var LogWriter *os.File
+const MaxModels = 5
 
-//-----------------------------------------------------------------------------
-
-func GetEnv(key, def string) string {
-	return Value(os.Getenv(key), def)
-}
+var (
+	LogFile   = GetEnv("LOG_FILE", "")
+	LogWriter *os.File
+	Model     = MaxModels
+)
 
 //-----------------------------------------------------------------------------
 
@@ -41,4 +40,10 @@ func InitLogFile() func() {
 	log.SetOutput(LogWriter)
 
 	return func() { LogWriter.Close() }
+}
+
+//-----------------------------------------------------------------------------
+
+func GetEnv(key, def string) string {
+	return Value(os.Getenv(key), def)
 }

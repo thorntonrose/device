@@ -32,7 +32,7 @@ func (self PlusI) Run(parameters []string) (skip int) {
 
 func (self PlusI) Transmit(a int) (skip int) {
 	data := string(*self.Memory.Buffers[mem.Transmit])
-	log.Printf("Transmit: %v\n", data)
+	log.Printf("Transmit: %v (%s)\n", []byte(data), data)
 	fmt.Print(data + If(a == 1, "\n", ""))
 
 	return
