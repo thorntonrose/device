@@ -78,7 +78,7 @@ Slot Number | Size (Bytes) | Description         |
 
 Buffers are special memory slots for data manipulation and I/O. Device has two buffers: buffer 1 (transmit) and buffer 2 (receive). Additionally, Device has two virtual buffers for viewing or manipulating the contents of a physical buffer: source (read) and destination (write).
 
-Each virtual buffer has a pointer that indicates the current read/write position in the buffer. The pointer of the source buffer can be moved with various commands. The pointer of the destination buffer is always at the end of the data, and moves automatically as data is written to the buffer.
+Each virtual buffer has a pointer that indicates the current read/write position in the buffer. The pointer of the source buffer can be moved with various commands. The pointer of the destination buffer is always at the end of the data and moves automatically as data is written to the buffer.
 
 **Example:**
 

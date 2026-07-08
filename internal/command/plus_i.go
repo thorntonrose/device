@@ -39,8 +39,7 @@ func (self PlusI) Transmit(a int) (skip int) {
 }
 
 func (self *PlusI) Receive(t int, s int, n int) (skip int) {
-	reader := io.LimitReader(os.Stdin, int64(n))
-	data := Must(io.ReadAll(reader))
+	data := Must(io.ReadAll(io.LimitReader(os.Stdin, int64(n))))
 	log.Printf("Receive: %v (%s)\n", data, string(data))
 
 	if len(data) > 0 {
