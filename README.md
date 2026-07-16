@@ -13,7 +13,7 @@ See [manual.md](manual.md).
 To install:
 
 ```
-GOSUMDB=off go install github.com/thorntonrose/device@latest
+GOSUMDB=off go install github.com/thorntonrose/device/cmd@latest
 ```
 
 
@@ -30,7 +30,18 @@ To build:
 mage build
 ```
 
-Output is `./device`.
+Output is `./bin/device`.
+
+
+## Run
+
+To run:
+
+```
+./bin/device [flags] <file>
+```
+
+Run with `-h` or `-help` for help.
 
 
 ## Test

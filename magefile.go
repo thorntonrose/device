@@ -7,12 +7,16 @@ import (
 	"os"
 	"strings"
 
+	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
 
 var (
-	Name        = "device"
-	Pkg         = "./..."
+	Name = "device"
+	Pkg  = "./..."
+
+	BinDir      = "bin"
+	CmdDir      = "cmd"
 	TempDir     = "tmp"
 	Tests       = "Test"
 	TestTempDir = TempDir + "/test"
@@ -26,13 +30,20 @@ var (
 func Clean() {
 	fmt.Println("> Clean")
 	os.RemoveAll(Name)
+	os.RemoveAll(BinDir)
 	os.RemoveAll(TempDir)
 	Bash("go clean -cache")
 }
 
+func Tidy() {
+	fmt.Println("> Tidy")
+	Bash("go mod tidy -v")
+}
+
 func Build() {
 	fmt.Println("> Build")
-	Bash("go build -o %s .", Name)
+	os.MkdirAll(BinDir, 0755)
+	Bash("go build -o %s/%s ./%s", BinDir, Name, CmdDir)
 }
 
 func Test() {
@@ -44,6 +55,13 @@ func Test() {
 	sh.Rm(TestTempDir)
 	os.MkdirAll(TestTempDir, 0755)
 	Bash("go test -v -tags test -run %s %s", GetEnv("TESTS", Tests), GetEnv("PACKAGE", Pkg))
+}
+
+func Run(args string) {
+	mg.SerialDeps(Tidy)
+
+	fmt.Println("> Run")
+	Bash("go run ./%s/main.go %s", CmdDir, args)
 }
 
 //-----------------------------------------------------------------------------

@@ -61,17 +61,18 @@ Device has a small amount of memory for data and programs.
 
 **Memory Layout:**
 
-Slot Number | Size (Bytes) | Description         |
-------------|--------------|---------------------|
-000 - 001   | -            | reserved            |
-002         | 250          | buffer 1 (transmit) |
-003         | 250          | buffer 2 (receive)  |
-004 - 006   | -            | buffers 3-5         |
-007 - 019   | -            | reserved            |
-020 - 099   | 120          | general purpose     |
-100 - 112   | -            | reserved            |
-113 - 949   | 120          | general purpose     |
-950 - 999   | -            | reserved            |
+| Slot Number | Size (Bytes) | Description         |
+|-------------|--------------|---------------------|
+| 000 - 001   | -            | reserved            |
+| 002         | 250          | buffer 1 (transmit) |
+| 003         | 250          | buffer 2 (receive)  |
+| 004 - 006   | -            | buffers 3-5         |
+| 007 - 019   | -            | reserved            |
+| 020         | 120          | startup script      |
+| 021 - 099   | 120          | scripts / general   |
+| 100 - 112   | -            | reserved            |
+| 113 - 949   | 120          | scripts / general   |
+| 950 - 999   | -            | reserved            |
 
 
 ## Buffers
